@@ -1,0 +1,28 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+out/
+appsettings.Development.json
+appsettings.Local.json
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+.vscode/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.user
+environment.ts
+environment.prod.ts

@@ -1,0 +1,53 @@
+<article class="blog-card card">
+    <!-- Cover image -->
+    <a [routerLink]="['/blog', blog.id]" class="card-cover-link">
+        <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" [alt]="blog.title" class="card-cover">
+        <div *ngIf="!blog.coverImageUrl" class="card-cover-placeholder">
+            <span>✦</span>
+        </div>
+    </a>
+
+    <div class="card-body">
+        <!-- Category + status -->
+        <div class="card-meta-top">
+            <span class="badge badge-primary" *ngIf="blog.category">{{ blog.category }}</span>
+            <span class="badge badge-warning" *ngIf="showActions && !blog.isPublished">Draft</span>
+        </div>
+
+        <!-- Title -->
+        <a [routerLink]="['/blog', blog.id]" class="card-title-link">
+            <h3 class="card-title">{{ blog.title }}</h3>
+        </a>
+
+        <!-- Summary -->
+        <p class="card-summary" *ngIf="blog.summary">{{ blog.summary }}</p>
+
+        <!-- Tags -->
+        <div class="card-tags" *ngIf="getTags().length > 0">
+            <span class="tag" *ngFor="let tag of getTags()">{{ tag }}</span>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+            <div class="card-author">
+                <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName"
+                    class="author-avatar">
+                <span *ngIf="!blog.author.avatarUrl" class="author-avatar author-avatar-init">
+                    {{ getInitials(blog.author.fullName) }}
+                </span>
+                <span class="author-name">{{ blog.author.fullName }}</span>
+            </div>
+            <div class="card-stats">
+                <span class="stat">👁 {{ blog.viewCount }}</span>
+                <span class="stat">❤ {{ blog.likeCount }}</span>
+                <span class="stat">{{ blog.readTimeMinutes }}m</span>
+            </div>
+        </div>
+
+        <!-- Actions (dashboard) -->
+        <div class="card-actions" *ngIf="showActions">
+            <button class="btn btn-outline btn-sm" (click)="onEdit.emit(blog.id)">✏ Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="onDelete.emit(blog.id)">🗑 Delete</button>
+        </div>
+    </div>
+</article>

@@ -1,0 +1,111 @@
+<div class="page-wrapper">
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+        <div class="spinner" style="width:32px;height:32px;border-width:3px"></div>
+    </div>
+
+    <div class="container detail-container" *ngIf="!loading && blog">
+        <!-- Back -->
+        <a routerLink="/" class="back-link">← Back to blogs</a>
+
+        <!-- Header -->
+        <header class="blog-header">
+            <div class="blog-meta">
+                <span class="badge badge-primary" *ngIf="blog.category">{{ blog.category }}</span>
+                <span class="text-muted">{{ blog.readTimeMinutes }} min read</span>
+                <span class="text-muted">·</span>
+                <span class="text-muted" *ngIf="blog.publishedAt">{{ formatDate(blog.publishedAt) }}</span>
+            </div>
+            <h1 class="blog-title">{{ blog.title }}</h1>
+
+            <!-- Author info -->
+            <div class="blog-author">
+                <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName"
+                    class="author-avatar">
+                <span *ngIf="!blog.author.avatarUrl" class="author-avatar author-avatar-init">
+                    {{ getInitials(blog.author.fullName) }}
+                </span>
+                <div>
+                    <div class="author-name">{{ blog.author.fullName }}</div>
+                    <div class="author-date text-muted">{{ formatDate(blog.createdAt) }}</div>
+                </div>
+            </div>
+
+            <!-- Cover image -->
+            <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" [alt]="blog.title" class="blog-cover">
+        </header>
+
+        <!-- Content -->
+        <div class="blog-content" [innerHTML]="blog.content"></div>
+
+        <!-- Tags -->
+        <div class="blog-tags" *ngIf="getTags().length > 0">
+            <span class="tag" *ngFor="let tag of getTags()">{{ tag }}</span>
+        </div>
+
+        <!-- Reactions bar -->
+        <div class="reactions-bar">
+            <button class="reaction-btn" [class.liked]="blog.isLikedByCurrentUser" (click)="toggleLike()"
+                [disabled]="likeLoading">
+                {{ blog.isLikedByCurrentUser ? '❤️' : '🤍' }}
+                <span>{{ blog.likeCount }}</span>
+            </button>
+            <span class="reaction-sep">·</span>
+            <span class="reaction-stat">💬 {{ blog.commentCount }} comment{{ blog.commentCount !== 1 ? 's' : ''
+                }}</span>
+            <span class="reaction-sep">·</span>
+            <span class="reaction-stat">👁 {{ blog.viewCount }} view{{ blog.viewCount !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Comments section -->
+        <section class="comments-section">
+            <h2 class="comments-title">Comments ({{ blog.commentCount }})</h2>
+
+            <!-- Add comment -->
+            <div class="add-comment" *ngIf="authService.isLoggedIn">
+                <img *ngIf="authService.currentUser?.avatarUrl" [src]="authService.currentUser?.avatarUrl"
+                    class="author-avatar">
+                <span *ngIf="!authService.currentUser?.avatarUrl" class="author-avatar author-avatar-init">
+                    {{ getInitials(authService.currentUser?.fullName || '') }}
+                </span>
+                <div class="comment-input-wrapper">
+                    <textarea class="form-control comment-textarea" [(ngModel)]="commentInput"
+                        placeholder="Add a comment…" rows="2"></textarea>
+                    <button class="btn btn-primary btn-sm" (click)="addComment()"
+                        [disabled]="!commentInput.trim() || commentLoading">
+                        <span class="spinner" *ngIf="commentLoading"></span>
+                        Post
+                    </button>
+                </div>
+            </div>
+
+            <div class="login-to-comment" *ngIf="!authService.isLoggedIn">
+                <a routerLink="/auth/login">Sign in</a> to leave a comment
+            </div>
+
+            <!-- Comment list -->
+            <div class="comment-list" *ngIf="comments.length > 0">
+                <div class="comment" *ngFor="let comment of comments">
+                    <img *ngIf="comment.author.avatarUrl" [src]="comment.author.avatarUrl" class="author-avatar">
+                    <span *ngIf="!comment.author.avatarUrl" class="author-avatar author-avatar-init">
+                        {{ getInitials(comment.author.fullName) }}
+                    </span>
+                    <div class="comment-body">
+                        <div class="comment-header">
+                            <span class="comment-author">{{ comment.author.fullName }}</span>
+                            <span class="comment-date text-muted">{{ formatDate(comment.createdAt) }}</span>
+                            <button *ngIf="authService.currentUser?.id === comment.author.id"
+                                class="btn btn-ghost btn-sm comment-delete"
+                                (click)="deleteComment(comment.id)">🗑</button>
+                        </div>
+                        <p class="comment-content">{{ comment.content }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty-state" style="padding:40px 0" *ngIf="comments.length === 0">
+                <p class="text-muted">No comments yet. Be the first!</p>
+            </div>
+        </section>
+    </div>
+</div>

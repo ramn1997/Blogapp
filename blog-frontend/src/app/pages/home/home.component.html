@@ -1,0 +1,57 @@
+<div class="page-wrapper">
+    <!-- Hero section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Ideas worth sharing</h1>
+            <p class="hero-subtitle">
+                Discover thoughtful writing on technology, design, science, and more.
+            </p>
+
+            <!-- Search -->
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search blogs, topics, authors…"
+                    [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+                <button class="btn btn-primary btn-sm" (click)="onSearch()">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <div class="container">
+        <!-- Category filters -->
+        <div class="categories-bar" *ngIf="categories.length > 0">
+            <button class="category-pill" [class.active]="selectedCategory === ''"
+                (click)="selectCategory('')">All</button>
+            <button *ngFor="let cat of categories" class="category-pill" [class.active]="selectedCategory === cat"
+                (click)="selectCategory(cat)">{{ cat }}</button>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-state" *ngIf="loading">
+            <div class="spinner" style="width:28px;height:28px;border-width:3px"></div>
+            <span class="text-muted" style="margin-left:12px">Loading posts…</span>
+        </div>
+
+        <!-- Blog grid -->
+        <div class="blog-grid" *ngIf="!loading && blogs.length > 0">
+            <app-blog-card *ngFor="let blog of blogs" [blog]="blog"></app-blog-card>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" *ngIf="!loading && blogs.length === 0">
+            <div class="empty-state-icon">📝</div>
+            <h3>No posts found</h3>
+            <p>Try a different search query or category</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="!loading && totalPages > 1">
+            <button class="page-btn" [disabled]="currentPage === 1" (click)="loadBlogs(currentPage - 1)">←</button>
+            <button *ngFor="let page of getPages()" class="page-btn" [class.active]="currentPage === page"
+                (click)="loadBlogs(page)">{{ page }}</button>
+            <button class="page-btn" [disabled]="currentPage === totalPages"
+                (click)="loadBlogs(currentPage + 1)">→</button>
+        </div>
+    </div>
+</div>

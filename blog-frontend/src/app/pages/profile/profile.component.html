@@ -1,0 +1,63 @@
+<div class="page-wrapper">
+    <div class="container profile-container">
+        <h1 class="page-title">Profile Settings</h1>
+
+        <!-- Avatar preview -->
+        <div class="profile-top" *ngIf="user">
+            <div class="avatar-section">
+                <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" [alt]="user.fullName" class="profile-avatar">
+                <span *ngIf="!user.avatarUrl" class="profile-avatar avatar-init">
+                    {{ getInitials(user.fullName) }}
+                </span>
+                <div>
+                    <div class="profile-name">{{ user.fullName }}</div>
+                    <div class="profile-email text-muted">{{ user.email }}</div>
+                    <span class="badge badge-muted mt-1">{{ getProviderLabel(user.provider) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+        <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+        <!-- Form -->
+        <div class="profile-form card">
+            <div class="card-body">
+                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+                    <div class="form-group">
+                        <label class="form-label">Display name</label>
+                        <input type="text" formControlName="fullName" class="form-control" placeholder="Your full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Preferred email
+                            <span class="label-hint">Used for notifications</span>
+                        </label>
+                        <input type="email" formControlName="preferredEmail" class="form-control"
+                            placeholder="alt@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Avatar URL</label>
+                        <input type="url" formControlName="avatarUrl" class="form-control"
+                            placeholder="https://example.com/avatar.jpg">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bio</label>
+                        <textarea formControlName="bio" class="form-control" rows="4"
+                            placeholder="Tell us a little about yourself…"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" [disabled]="loading">
+                        <span class="spinner" *ngIf="loading"></span>
+                        {{ loading ? 'Saving…' : 'Save changes' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="page-wrapper">
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h1 class="page-title">My Dashboard</h1>
+                <p class="text-muted">Manage your blog posts</p>
+            </div>
+            <a routerLink="/write" class="btn btn-primary">✏ Write new post</a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row" *ngIf="!loading">
+            <div class="stat-card">
+                <div class="stat-value">{{ blogs.length }}</div>
+                <div class="stat-label">Total posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ publishedCount }}</div>
+                <div class="stat-label">Published</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ draftCount }}</div>
+                <div class="stat-label">Drafts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ totalViews }}</div>
+                <div class="stat-label">Total views</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ totalLikes }}</div>
+                <div class="stat-label">Total likes</div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading-state" *ngIf="loading">
+            <div class="spinner" style="width:28px;height:28px;border-width:3px"></div>
+        </div>
+
+        <!-- Blog grid -->
+        <div class="blog-grid" *ngIf="!loading && blogs.length > 0">
+            <app-blog-card *ngFor="let blog of blogs" [blog]="blog" [showActions]="true" (onEdit)="editBlog($event)"
+                (onDelete)="deleteBlog($event)">
+            </app-blog-card>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" *ngIf="!loading && blogs.length === 0">
+            <div class="empty-state-icon">✍️</div>
+            <h3>No posts yet</h3>
+            <p>Write your first blog post</p>
+            <a routerLink="/write" class="btn btn-primary mt-2">Start writing</a>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="!loading && totalPages > 1">
+            <button class="page-btn" [disabled]="currentPage === 1" (click)="loadBlogs(currentPage - 1)">←</button>
+            <button *ngFor="let page of getPages()" class="page-btn" [class.active]="currentPage === page"
+                (click)="loadBlogs(page)">{{ page }}</button>
+            <button class="page-btn" [disabled]="currentPage === totalPages"
+                (click)="loadBlogs(currentPage + 1)">→</button>
+        </div>
+    </div>
+</div>

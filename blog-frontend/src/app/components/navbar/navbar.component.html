@@ -1,0 +1,72 @@
+<nav class="navbar">
+    <div class="nav-container">
+        <!-- Brand -->
+        <a routerLink="/" class="nav-brand">
+            <span class="brand-icon">✦</span>
+            <span>ThoughtStream</span>
+        </a>
+
+        <!-- Desktop nav links -->
+        <div class="nav-links">
+            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"
+                class="nav-link">Explore</a>
+        </div>
+
+        <!-- Right actions -->
+        <div class="nav-actions">
+            <ng-container *ngIf="!currentUser; else loggedIn">
+                <a routerLink="/auth/login" class="btn btn-ghost btn-sm">Sign in</a>
+                <a routerLink="/auth/register" class="btn btn-primary btn-sm">Get started</a>
+            </ng-container>
+
+            <ng-template #loggedIn>
+                <a routerLink="/write" class="btn btn-primary btn-sm nav-write-btn">
+                    <span>✏</span> Write
+                </a>
+
+                <div class="user-menu-wrapper" *ngIf="currentUser">
+                    <button class="avatar-btn" (click)="toggleUserMenu()">
+                        <img *ngIf="currentUser?.avatarUrl" [src]="currentUser!.avatarUrl" [alt]="currentUser!.fullName"
+                            class="avatar">
+                        <span *ngIf="!currentUser?.avatarUrl" class="avatar avatar-fallback">
+                            {{ getInitials(currentUser!.fullName) }}
+                        </span>
+                    </button>
+
+                    <div class="user-dropdown" *ngIf="userMenuOpen && currentUser">
+                        <div class="dropdown-header">
+                            <div class="dropdown-name">{{ currentUser.fullName }}</div>
+                            <div class="dropdown-email text-muted">{{ currentUser.email }}</div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a routerLink="/dashboard" class="dropdown-item" (click)="closeMenus()">📊 My Blogs</a>
+                        <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">👤 Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item dropdown-item-danger" (click)="logout()">🚪 Sign out</button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <!-- Mobile burger -->
+            <button class="burger-btn" (click)="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" *ngIf="menuOpen">
+        <a routerLink="/" class="mobile-link" (click)="closeMenus()">Explore</a>
+        <ng-container *ngIf="!currentUser">
+            <a routerLink="/auth/login" class="mobile-link" (click)="closeMenus()">Sign in</a>
+            <a routerLink="/auth/register" class="mobile-link mobile-link-primary" (click)="closeMenus()">Get
+                started</a>
+        </ng-container>
+        <ng-container *ngIf="currentUser">
+            <a routerLink="/write" class="mobile-link" (click)="closeMenus()">✏ Write</a>
+            <a routerLink="/dashboard" class="mobile-link" (click)="closeMenus()">📊 My Blogs</a>
+            <a routerLink="/profile" class="mobile-link" (click)="closeMenus()">👤 Profile</a>
+            <button class="mobile-link mobile-link-danger" (click)="logout()">🚪 Sign out</button>
+        </ng-container>
+    </div>
+</nav>

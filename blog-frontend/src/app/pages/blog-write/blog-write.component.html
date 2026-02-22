@@ -1,0 +1,97 @@
+<div class="page-wrapper">
+    <div class="container write-container">
+        <div class="write-header">
+            <h1 class="write-title">{{ isEditMode ? 'Edit post' : 'Write a new post' }}</h1>
+            <div class="write-actions" *ngIf="!loading">
+                <button class="btn btn-outline" (click)="onSubmit(false)" [disabled]="loading">Save draft</button>
+                <button class="btn btn-primary" (click)="onSubmit(true)" [disabled]="loading">
+                    <span class="spinner" *ngIf="loading"></span>
+                    Publish
+                </button>
+            </div>
+        </div>
+
+        <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+        <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+
+        <form [formGroup]="form">
+            <!-- Title -->
+            <div class="form-group">
+                <label class="form-label">Title *</label>
+                <input type="text" formControlName="title" class="form-control title-input"
+                    [class.is-invalid]="f['title'].touched && f['title'].invalid"
+                    placeholder="Give your post a great title…">
+                <div class="field-error" *ngIf="f['title'].touched && f['title'].errors?.['required']">Title is required
+                </div>
+                <div class="field-error" *ngIf="f['title'].touched && f['title'].errors?.['minlength']">At least 5
+                    characters</div>
+            </div>
+
+            <!-- Cover image -->
+            <div class="form-group">
+                <label class="form-label">Cover image URL (optional)</label>
+                <input type="url" formControlName="coverImageUrl" class="form-control"
+                    placeholder="https://example.com/image.jpg">
+                <img *ngIf="form.value.coverImageUrl" [src]="form.value.coverImageUrl" alt="Cover preview"
+                    class="cover-preview">
+            </div>
+
+            <!-- Content -->
+            <div class="form-group">
+                <div class="content-label-row">
+                    <label class="form-label">Content *</label>
+                    <span class="word-count text-muted">{{ wordCount() }} words</span>
+                </div>
+                <textarea formControlName="content" class="form-control content-area"
+                    [class.is-invalid]="f['content'].touched && f['content'].invalid"
+                    placeholder="Write your story here… HTML is supported"></textarea>
+                <div class="field-error" *ngIf="f['content'].touched && f['content'].errors?.['required']">Content is
+                    required</div>
+                <div class="field-error" *ngIf="f['content'].touched && f['content'].errors?.['minlength']">Too short –
+                    add more content</div>
+            </div>
+
+            <!-- Summary -->
+            <div class="form-group">
+                <label class="form-label">Summary (optional)</label>
+                <textarea formControlName="summary" class="form-control"
+                    placeholder="A short description shown in listings (auto-generated if left blank)"
+                    rows="2"></textarea>
+            </div>
+
+            <!-- Category & Tags row -->
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Category</label>
+                    <select formControlName="category" class="form-control">
+                        <option value="">Select category</option>
+                        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                    </select>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Tags</label>
+                    <input type="text" formControlName="tags" class="form-control"
+                        placeholder="angular, webdev, typescript (comma-separated)">
+                </div>
+            </div>
+
+            <!-- Publish toggle -->
+            <div class="publish-row">
+                <label class="toggle-label">
+                    <input type="checkbox" formControlName="isPublished" class="toggle-input">
+                    <span class="toggle-text">Publish immediately</span>
+                </label>
+            </div>
+
+            <!-- Submit buttons -->
+            <div class="form-submit">
+                <button type="button" class="btn btn-outline btn-lg" (click)="onSubmit(false)" [disabled]="loading">Save
+                    draft</button>
+                <button type="button" class="btn btn-primary btn-lg" (click)="onSubmit(true)" [disabled]="loading">
+                    <span class="spinner" *ngIf="loading"></span>
+                    {{ loading ? 'Publishing…' : '🚀 Publish' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
