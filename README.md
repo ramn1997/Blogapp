@@ -2,6 +2,14 @@
 
 A modern blogging platform built with **Angular 19** + **ASP.NET Core 10** + **SQL Server**, featuring Google and Microsoft OAuth authentication.
 
+## 🌐 Live URLs
+
+*   **Frontend**: [https://ramn1997.github.io/Blogapp/](https://ramn1997.github.io/Blogapp/)
+*   **Backend (API)**: [http://localhost:5000](http://localhost:5000) (Local)
+*   **API Public Image**: `ghcr.io/ramn1997/blogapp-api:latest`
+
+---
+
 ## 🏗 Architecture
 
 ```
@@ -134,22 +142,29 @@ ng serve                    # Opens http://localhost:4200
 
 ## 🐳 Docker Deployment
 
-### Build and push API to GHCR
+### 🔴 Public vs. Local
+*   **Local Build**: By default, the `docker-compose.yml` is configured to build the image locally from source.
+*   **Public Image**: The GitHub Actions push the container to **GitHub Container Registry (GHCR)**. To make this image public:
+    1. Go to your GitHub profile → **Packages**.
+    2. Select `blogapp-api`.
+    3. Go to **Package Settings**.
+    4. Scroll to "Danger Zone" and click **Change visibility** → **Public**.
+
+### Build and push API to GHCR manually
 
 ```bash
-docker build -t ghcr.io/YOUR_USERNAME/blogapp-api:latest ./BlogApp.API
-docker push ghcr.io/YOUR_USERNAME/blogapp-api:latest
+docker build -t ghcr.io/ramn1997/blogapp-api:latest ./BlogApp.API
+docker push ghcr.io/ramn1997/blogapp-api:latest
 ```
 
 ### Run full stack with Docker Compose
 
 ```bash
-# Edit docker-compose.yml → replace YOUR_GITHUB_USERNAME
 docker compose up -d
 ```
 
 This starts:
-- **API** on port `5000`
+- **API** on port `5000` (mapped to internal 8080)
 - **SQL Server 2022 Express** on port `1433`
 
 ---
@@ -158,13 +173,13 @@ This starts:
 
 The workflow (`.github/workflows/ci-cd.yml`) runs on push to `main`:
 
-1. **Build API** → Creates Docker image → Pushes to `ghcr.io`
+1. **Build API** → Creates Docker image → Pushes to `ghcr.io/ramn1997/blogapp-api`
 2. **Build Frontend** → `ng build` → Deploys to **GitHub Pages**
 
 ### Setup
-1. Push this repo to GitHub
-2. Go to **Settings → Pages → Source**: `gh-pages` branch
-3. Make sure `packages: write` permission is enabled for Actions
+1. Push this repo to GitHub.
+2. Go to **Settings → Pages → Source**: `gh-pages` branch.
+3. Ensure your GitHub Action has `write` permissions to deploy.
 
 ---
 

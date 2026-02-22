@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/blogapp-api
+  IMAGE_NAME: ramn1997/blogapp-api
 
 jobs:
   # ─── Build & Test API ────────────────────────────────────────────
@@ -29,10 +29,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore ./BlogApp.API/BlogApp.API.csproj
+        run: dotnet restore BlogApp.API/BlogApp.API.csproj
 
       - name: Build
-        run: dotnet build ./BlogApp.API/BlogApp.API.csproj --no-restore -c Release
+        run: dotnet build BlogApp.API/BlogApp.API.csproj --no-restore -c Release
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
@@ -85,7 +85,7 @@ jobs:
         working-directory: ./blog-frontend
 
       - name: Build Angular app
-        run: npm run build -- --base-href /blogapp/
+        run: npm run build -- --base-href /Blogapp/
         working-directory: ./blog-frontend
 
       - name: Deploy to GitHub Pages
