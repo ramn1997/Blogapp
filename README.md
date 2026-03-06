@@ -1,8 +1,8 @@
-# ✦ ThoughtStream — Full-Stack Blog Platform
+#  ThoughtStream — Full-Stack Blog Platform
 
 A modern blogging platform built with **Angular 19** + **ASP.NET Core 10** + **SQL Server**, featuring Google and Microsoft OAuth authentication.
 
-## 🌐 Live URLs
+##  Live URLs
 
 *   **Frontend**: [https://ramn1997.github.io/Blogapp/](https://ramn1997.github.io/Blogapp/)
 *   **Backend (API)**: [http://localhost:5000](http://localhost:5000) (Local)
@@ -10,7 +10,7 @@ A modern blogging platform built with **Angular 19** + **ASP.NET Core 10** + **S
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```
 BlogApp/
@@ -35,35 +35,35 @@ BlogApp/
 └── docker-compose.yml    # API + SQL Server stack
 ```
 
-## 🔑 Features
+##  Features
 
 - **Authentication**
-  - ✅ Register with email + password + preferred email
-  - ✅ Login with email + password
-  - ✅ **Google OAuth** (via Google Identity Services SDK)
-  - ✅ **Microsoft OAuth** (via MSAL Browser)
-  - ✅ JWT tokens with 7-day expiry
+  -  Register with email + password + preferred email
+  -  Login with email + password
+  -  **Google OAuth** (via Google Identity Services SDK)
+  -  **Microsoft OAuth** (via MSAL Browser)
+  -  JWT tokens with 7-day expiry
 - **Blog Posts**
-  - ✅ Create/edit/delete posts
-  - ✅ Draft vs. published status
-  - ✅ Categories and tags
-  - ✅ Cover image
-  - ✅ Auto-calculated read time
-  - ✅ Full-text search + category filter
-  - ✅ Pagination
+  -  Create/edit/delete posts
+  -  Draft vs. published status
+  -  Categories and tags
+  -  Cover image
+  -  Auto-calculated read time
+  -  Full-text search + category filter
+  -  Pagination
 - **Engagement**
-  - ✅ Like/unlike posts
-  - ✅ Comments with delete
-  - ✅ View count tracking
+  -  Like/unlike posts
+  -  Comments with delete
+  -  View count tracking
 - **Profile**
-  - ✅ Edit display name, bio, preferred email, avatar
+  -  Edit display name, bio, preferred email, avatar
 - **Deployment**
-  - ✅ API → Docker image → GitHub Container Registry (GHCR)
-  - ✅ Frontend → GitHub Pages via GitHub Actions
+  -  API → Docker image → GitHub Container Registry (GHCR)
+  -  Frontend → GitHub Pages via GitHub Actions
 
 ---
 
-## ⚡ Quick Start
+##  Quick Start
 
 ### Prerequisites
 - .NET 10 SDK
@@ -122,7 +122,7 @@ ng serve                    # Opens http://localhost:4200
 
 ---
 
-## 🔐 OAuth Setup
+##  OAuth Setup
 
 ### Google OAuth
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
@@ -140,9 +140,9 @@ ng serve                    # Opens http://localhost:4200
 
 ---
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
-### 🔴 Public vs. Local
+###  Public vs. Local
 *   **Local Build**: By default, the `docker-compose.yml` is configured to build the image locally from source.
 *   **Public Image**: The GitHub Actions push the container to **GitHub Container Registry (GHCR)**. To make this image public:
     1. Go to your GitHub profile → **Packages**.
@@ -169,7 +169,7 @@ This starts:
 
 ---
 
-## 🚀 GitHub Actions CI/CD
+##  GitHub Actions CI/CD
 
 The workflow (`.github/workflows/ci-cd.yml`) runs on push to `main`:
 
@@ -207,7 +207,7 @@ Full Swagger docs at: `http://localhost:5000/swagger`
 
 ---
 
-## 🎨 Design System
+##  Design System
 
 - **Dark theme** by default
 - **Inter** font from Google Fonts
