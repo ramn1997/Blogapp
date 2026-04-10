@@ -1,7 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://ghcr.io/YOUR_GITHUB_USERNAME/blogapp-api',
-    googleClientId: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
-    microsoftClientId: 'YOUR_MICROSOFT_CLIENT_ID',
-    microsoftTenantId: 'common'
+    apiUrl: 'http://localhost:5000', // Set this to your live API URL if you deploy the backend
+    googleClientId: '391768819107-0t2nt3q06qsspvg3re3b73e3jo1pfdku.apps.googleusercontent.com'
 };
