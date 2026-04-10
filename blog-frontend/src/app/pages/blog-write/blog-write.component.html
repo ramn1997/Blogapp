@@ -2,13 +2,6 @@
     <div class="container write-container">
         <div class="write-header">
             <h1 class="write-title">{{ isEditMode ? 'Edit post' : 'Write a new post' }}</h1>
-            <div class="write-actions" *ngIf="!loading">
-                <button class="btn btn-outline" (click)="onSubmit(false)" [disabled]="loading">Save draft</button>
-                <button class="btn btn-primary" (click)="onSubmit(true)" [disabled]="loading">
-                    <span class="spinner" *ngIf="loading"></span>
-                    Publish
-                </button>
-            </div>
         </div>
 
         <div class="alert alert-error" *ngIf="error">{{ error }}</div>
@@ -38,9 +31,16 @@
 
             <!-- Content -->
             <div class="form-group">
-                <div class="content-label-row">
+                <div class="content-header-row">
                     <label class="form-label">Content *</label>
-                    <span class="word-count text-muted">{{ wordCount() }} words</span>
+                    <div class="content-toolbar">
+                        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
+                        <button type="button" class="btn btn-ghost btn-sm" (click)="fileInput.click()" [disabled]="uploading">
+                            <span class="material-icons" style="font-size: 1.2rem; vertical-align: middle; margin-right: 4px;">image</span>
+                            {{ uploading ? 'Uploading...' : 'Add Image' }}
+                        </button>
+                        <span class="word-count text-muted">{{ wordCount() }} words</span>
+                    </div>
                 </div>
                 <textarea formControlName="content" class="form-control content-area"
                     [class.is-invalid]="f['content'].touched && f['content'].invalid"
@@ -85,11 +85,12 @@
 
             <!-- Submit buttons -->
             <div class="form-submit">
+                <button type="button" class="btn btn-ghost btn-lg" (click)="onCancel()" [disabled]="loading">Cancel</button>
                 <button type="button" class="btn btn-outline btn-lg" (click)="onSubmit(false)" [disabled]="loading">Save
                     draft</button>
                 <button type="button" class="btn btn-primary btn-lg" (click)="onSubmit(true)" [disabled]="loading">
-                    <span class="spinner" *ngIf="loading"></span>
-                    {{ loading ? 'Publishing…' : '🚀 Publish' }}
+                    <span class="material-icons" *ngIf="!loading" style="font-size: 1.2rem; vertical-align: middle; margin-right: 4px;">publish</span>
+                    {{ loading ? 'Publishing…' : 'Publish' }}
                 </button>
             </div>
         </form>

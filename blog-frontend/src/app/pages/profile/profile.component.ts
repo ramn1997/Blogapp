@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { User } from '../../models';
+import { BlogService } from '../../services/blog.service';
+import { User, Blog } from '../../models';
 
 @Component({
   standalone: false,
@@ -15,17 +16,68 @@ export class ProfileComponent implements OnInit {
   loading = false;
   success = '';
   error = '';
+  
+  isEditing = false;
+  activeTab = 'posts';
+  myBlogs: Blog[] = [];
+  savedBlogs: Blog[] = [];
+  drafts: Blog[] = [];
+  stats = { stories: 0, following: 0 };
 
-  constructor(private fb: FormBuilder, private authService: AuthService) { }
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService,
+    private blogService: BlogService
+  ) { }
 
   ngOnInit(): void {
     this.user = this.authService.currentUser;
+    this.initForm();
+    this.loadMyBlogs();
+    this.loadSavedBlogs();
+    this.loadDrafts();
+  }
+
+  private initForm(): void {
     this.form = this.fb.group({
-      fullName: [this.user?.fullName || ''],
+      fullName: [this.user?.fullName || '', Validators.required],
       bio: [this.user?.bio || ''],
-      preferredEmail: [this.user?.preferredEmail || ''],
+      preferredEmail: [this.user?.preferredEmail || '', Validators.email],
       avatarUrl: [this.user?.avatarUrl || '']
     });
+  }
+
+  loadMyBlogs(): void {
+    this.blogService.getMyBlogs(1, 100, true).subscribe({
+      next: (res) => {
+        this.myBlogs = res.items;
+        this.stats.stories = res.totalCount;
+      }
+    });
+  }
+
+  loadSavedBlogs(): void {
+    this.blogService.getSavedBlogs(1, 100).subscribe({
+      next: (res) => {
+        this.savedBlogs = res.items;
+        this.stats.following = res.totalCount;
+      }
+    });
+  }
+
+  loadDrafts(): void {
+    this.blogService.getMyBlogs(1, 100, false).subscribe({
+      next: (res) => {
+        this.drafts = res.items;
+      }
+    });
+  }
+
+  switchTab(tab: string): void {
+    this.activeTab = tab;
+    if (tab === 'posts') this.loadMyBlogs();
+    else if (tab === 'saved') this.loadSavedBlogs();
+    else this.loadDrafts();
   }
 
   onSubmit(): void {

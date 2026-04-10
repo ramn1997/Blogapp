@@ -12,12 +12,14 @@ namespace BlogApp.API.Services
         Task<BlogResponseDto> CreateBlogAsync(int userId, CreateBlogDto dto);
         Task<BlogResponseDto> UpdateBlogAsync(int blogId, int userId, UpdateBlogDto dto);
         Task DeleteBlogAsync(int blogId, int userId);
-        Task<BlogListResponseDto> GetUserBlogsAsync(int userId, int page, int pageSize);
+        Task<BlogListResponseDto> GetUserBlogsAsync(int userId, int page, int pageSize, bool? publishedOnly = null);
         Task<bool> ToggleLikeAsync(int blogId, int userId);
         Task<CommentResponseDto> AddCommentAsync(int blogId, int userId, CreateCommentDto dto);
         Task<List<CommentResponseDto>> GetCommentsAsync(int blogId);
         Task DeleteCommentAsync(int commentId, int userId);
         Task<List<string>> GetCategoriesAsync();
+        Task<bool> ToggleSaveAsync(int blogId, int userId);
+        Task<BlogListResponseDto> GetSavedBlogsAsync(int userId, int page, int pageSize);
     }
 
     public class BlogService : IBlogService
@@ -34,6 +36,7 @@ namespace BlogApp.API.Services
             var query = _context.Blogs
                 .Include(b => b.Author)
                 .Include(b => b.BlogLikes)
+                .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
                 .Where(b => b.IsPublished)
                 .AsQueryable();
@@ -66,6 +69,7 @@ namespace BlogApp.API.Services
             var blog = await _context.Blogs
                 .Include(b => b.Author)
                 .Include(b => b.BlogLikes)
+                .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
                 .FirstOrDefaultAsync(b => b.Id == id)
                 ?? throw new KeyNotFoundException("Blog not found.");
@@ -110,6 +114,7 @@ namespace BlogApp.API.Services
             var blog = await _context.Blogs
                 .Include(b => b.Author)
                 .Include(b => b.BlogLikes)
+                .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
                 .FirstOrDefaultAsync(b => b.Id == blogId && b.UserId == userId)
                 ?? throw new UnauthorizedAccessException("Blog not found or not authorized.");
@@ -147,13 +152,17 @@ namespace BlogApp.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<BlogListResponseDto> GetUserBlogsAsync(int userId, int page, int pageSize)
+        public async Task<BlogListResponseDto> GetUserBlogsAsync(int userId, int page, int pageSize, bool? publishedOnly = null)
         {
             var query = _context.Blogs
                 .Include(b => b.Author)
                 .Include(b => b.BlogLikes)
+                .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
                 .Where(b => b.UserId == userId);
+
+            if (publishedOnly.HasValue)
+                query = query.Where(b => b.IsPublished == publishedOnly.Value);
 
             var total = await query.CountAsync();
             var items = await query
@@ -236,6 +245,51 @@ namespace BlogApp.API.Services
                 .ToListAsync();
         }
 
+        public async Task<bool> ToggleSaveAsync(int blogId, int userId)
+        {
+            var existing = await _context.SavedBlogs
+                .FirstOrDefaultAsync(sb => sb.BlogId == blogId && sb.UserId == userId);
+
+            if (existing != null)
+            {
+                _context.SavedBlogs.Remove(existing);
+                await _context.SaveChangesAsync();
+                return false;
+            }
+
+            _context.SavedBlogs.Add(new SavedBlog { BlogId = blogId, UserId = userId });
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<BlogListResponseDto> GetSavedBlogsAsync(int userId, int page, int pageSize)
+        {
+            var query = _context.SavedBlogs
+                .Include(sb => sb.Blog)
+                .ThenInclude(b => b.Author)
+                .Include(sb => sb.Blog)
+                .ThenInclude(b => b.BlogLikes)
+                .Include(sb => sb.Blog)
+                .ThenInclude(b => b.SavedBlogs)
+                .Where(sb => sb.UserId == userId);
+
+            var total = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(sb => sb.SavedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new BlogListResponseDto
+            {
+                Items = items.Select(sb => MapToBlogResponse(sb.Blog, userId)).ToList(),
+                TotalCount = total,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double)total / pageSize)
+            };
+        }
+
         private static BlogResponseDto MapToBlogResponse(Blog blog, int? currentUserId) => new()
         {
             Id = blog.Id,
@@ -248,9 +302,10 @@ namespace BlogApp.API.Services
             IsPublished = blog.IsPublished,
             ViewCount = blog.ViewCount,
             ReadTimeMinutes = blog.ReadTimeMinutes,
-            LikeCount = blog.BlogLikes.Count,
-            CommentCount = blog.Comments.Count,
-            IsLikedByCurrentUser = currentUserId.HasValue && blog.BlogLikes.Any(l => l.UserId == currentUserId.Value),
+            LikeCount = blog.BlogLikes?.Count ?? 0,
+            CommentCount = blog.Comments?.Count ?? 0,
+            IsLikedByCurrentUser = currentUserId.HasValue && blog.BlogLikes != null && blog.BlogLikes.Any(l => l.UserId == currentUserId.Value),
+            IsSavedByCurrentUser = currentUserId.HasValue && blog.SavedBlogs != null && blog.SavedBlogs.Any(s => s.UserId == currentUserId.Value),
             CreatedAt = blog.CreatedAt,
             PublishedAt = blog.PublishedAt,
             Author = new AuthorDto

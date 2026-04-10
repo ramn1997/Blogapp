@@ -14,6 +14,8 @@ export class DashboardComponent implements OnInit {
   loading = true;
   totalPages = 1;
   currentPage = 1;
+  showDeleteModal = false;
+  blogToDelete: number | null = null;
 
   constructor(private blogService: BlogService, private router: Router) { }
 
@@ -34,10 +36,21 @@ export class DashboardComponent implements OnInit {
 
   editBlog(id: number): void { this.router.navigate(['/write', id]); }
 
-  deleteBlog(id: number): void {
-    if (!confirm('Delete this post? This cannot be undone.')) return;
-    this.blogService.deleteBlog(id).subscribe(() => {
-      this.blogs = this.blogs.filter(b => b.id !== id);
+  confirmDelete(id: number): void {
+    this.blogToDelete = id;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.blogToDelete = null;
+  }
+
+  deleteBlog(): void {
+    if (!this.blogToDelete) return;
+    this.blogService.deleteBlog(this.blogToDelete).subscribe(() => {
+      this.blogs = this.blogs.filter(b => b.id !== this.blogToDelete);
+      this.cancelDelete();
     });
   }
 

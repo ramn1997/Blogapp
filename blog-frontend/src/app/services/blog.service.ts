@@ -34,10 +34,10 @@ export class BlogService {
         return this.http.delete(`${this.API}/${id}`);
     }
 
-    getMyBlogs(page = 1, pageSize = 10) {
-        return this.http.get<BlogListResponse>(`${this.API}/my`, {
-            params: new HttpParams().set('page', page).set('pageSize', pageSize)
-        });
+    getMyBlogs(page = 1, pageSize = 10, publishedOnly?: boolean) {
+        let params = new HttpParams().set('page', page).set('pageSize', pageSize);
+        if (publishedOnly !== undefined) params = params.set('publishedOnly', publishedOnly);
+        return this.http.get<BlogListResponse>(`${this.API}/my`, { params });
     }
 
     toggleLike(id: number) {
@@ -58,5 +58,21 @@ export class BlogService {
 
     getCategories() {
         return this.http.get<string[]>(`${this.API}/categories`);
+    }
+
+    toggleSave(id: number) {
+        return this.http.post<{ saved: boolean }>(`${this.API}/${id}/save`, {});
+    }
+
+    getSavedBlogs(page = 1, pageSize = 9) {
+        return this.http.get<BlogListResponse>(`${this.API}/saved`, {
+            params: new HttpParams().set('page', page).set('pageSize', pageSize)
+        });
+    }
+
+    uploadImage(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post<{ url: string }>(`${environment.apiUrl}/api/upload`, formData);
     }
 }

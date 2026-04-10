@@ -11,6 +11,7 @@ namespace BlogApp.API.Data
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<BlogLike> BlogLikes { get; set; }
+        public DbSet<SavedBlog> SavedBlogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,6 +58,23 @@ namespace BlogApp.API.Data
 
             modelBuilder.Entity<BlogLike>()
                 .HasIndex(bl => new { bl.UserId, bl.BlogId })
+                .IsUnique();
+
+            // SavedBlog
+            modelBuilder.Entity<SavedBlog>()
+                .HasOne(sb => sb.User)
+                .WithMany(u => u.SavedBlogs)
+                .HasForeignKey(sb => sb.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SavedBlog>()
+                .HasOne(sb => sb.Blog)
+                .WithMany(b => b.SavedBlogs)
+                .HasForeignKey(sb => sb.BlogId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SavedBlog>()
+                .HasIndex(sb => new { sb.UserId, sb.BlogId })
                 .IsUnique();
         }
     }

@@ -42,12 +42,14 @@ export class LoginComponent implements OnInit {
           client_id: environment.googleClientId,
           callback: (response: any) => this.handleGoogleCallback(response)
         });
-        google.accounts.id.renderButton(
-          document.getElementById('google-btn'),
-          { theme: 'outline', size: 'large', width: '100%', text: 'continue_with' }
-        );
       }
     }, 500);
+  }
+
+  triggerGoogleLogin(): void {
+    if (typeof google !== 'undefined') {
+      google.accounts.id.prompt();
+    }
   }
 
   private handleGoogleCallback(response: any): void {
@@ -67,40 +69,6 @@ export class LoginComponent implements OnInit {
         this.error = err?.error?.message || 'Google sign-in failed.';
         this.loading = false;
       }
-    });
-  }
-
-  signInWithMicrosoft(): void {
-    import('@azure/msal-browser').then(({ PublicClientApplication }) => {
-      const msalApp = new PublicClientApplication({
-        auth: {
-          clientId: environment.microsoftClientId,
-          authority: `https://login.microsoftonline.com/${environment.microsoftTenantId}`,
-          redirectUri: window.location.origin
-        }
-      });
-
-      msalApp.initialize().then(() => {
-        return msalApp.loginPopup({ scopes: ['openid', 'profile', 'email'] });
-      }).then((result: any) => {
-        this.loading = true;
-        this.authService.oauthLogin({
-          provider: 'microsoft',
-          idToken: result.idToken,
-          email: result.account.username,
-          fullName: result.account.name || result.account.username,
-          avatarUrl: undefined,
-          providerId: result.account.homeAccountId
-        }).subscribe({
-          next: () => this.router.navigate(['/']),
-          error: (err: any) => {
-            this.error = err?.error?.message || 'Microsoft sign-in failed.';
-            this.loading = false;
-          }
-        });
-      }).catch(() => {
-        this.error = 'Microsoft sign-in was cancelled or failed.';
-      });
     });
   }
 

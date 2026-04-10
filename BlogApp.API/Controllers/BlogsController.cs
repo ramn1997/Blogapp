@@ -101,10 +101,13 @@ namespace BlogApp.API.Controllers
         /// <summary>Get blogs by current user</summary>
         [Authorize]
         [HttpGet("my")]
-        public async Task<IActionResult> GetMyBlogs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetMyBlogs(
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 10,
+            [FromQuery] bool? publishedOnly = null)
         {
             var userId = GetCurrentUserId();
-            var result = await _blogService.GetUserBlogsAsync(userId, page, pageSize);
+            var result = await _blogService.GetUserBlogsAsync(userId, page, pageSize, publishedOnly);
             return Ok(result);
         }
 
@@ -116,6 +119,26 @@ namespace BlogApp.API.Controllers
             var userId = GetCurrentUserId();
             var liked = await _blogService.ToggleLikeAsync(id, userId);
             return Ok(new { liked });
+        }
+
+        /// <summary>Toggle save/unsave on a blog post</summary>
+        [Authorize]
+        [HttpPost("{id}/save")]
+        public async Task<IActionResult> ToggleSave(int id)
+        {
+            var userId = GetCurrentUserId();
+            var saved = await _blogService.ToggleSaveAsync(id, userId);
+            return Ok(new { saved });
+        }
+
+        /// <summary>Get current user's saved blogs</summary>
+        [Authorize]
+        [HttpGet("saved")]
+        public async Task<IActionResult> GetSavedBlogs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var userId = GetCurrentUserId();
+            var result = await _blogService.GetSavedBlogsAsync(userId, page, pageSize);
+            return Ok(result);
         }
 
         /// <summary>Get comments for a blog post</summary>

@@ -13,6 +13,7 @@ export class NavbarComponent implements OnInit {
   currentUser: User | null = null;
   menuOpen = false;
   userMenuOpen = false;
+  searchQuery = '';
 
   constructor(private authService: AuthService, private router: Router) { }
 
@@ -26,6 +27,12 @@ export class NavbarComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/']);
     this.userMenuOpen = false;
+  }
+
+  onSearch(): void {
+    if (!this.searchQuery.trim()) return;
+    this.router.navigate(['/'], { queryParams: { q: this.searchQuery } });
+    this.closeMenus();
   }
 
   getInitials(name: string): string {

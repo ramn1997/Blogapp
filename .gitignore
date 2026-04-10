@@ -1,28 +1,21 @@
-# .NET
-[Bb]in/
-[Oo]bj/
-out/
-appsettings.Development.json
-appsettings.Local.json
+# Visual Studio
+.vs/
+*.user
+*.sln
+*.suo
+*.userosscache
+*.sln.docstates
 
-# Node / Angular
-node_modules/
+# Build folders
+bin/
+obj/
+
+# Angular
 dist/
 .angular/
-.vscode/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Docker
-.dockerignore
+node_modules/
+build_log*.txt
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Secrets
-.env
-*.user
-environment.ts
-environment.prod.ts

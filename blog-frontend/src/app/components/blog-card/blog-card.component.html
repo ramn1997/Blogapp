@@ -1,53 +1,58 @@
-<article class="blog-card card">
-    <!-- Cover image -->
-    <a [routerLink]="['/blog', blog.id]" class="card-cover-link">
-        <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" [alt]="blog.title" class="card-cover">
-        <div *ngIf="!blog.coverImageUrl" class="card-cover-placeholder">
-            <span>✦</span>
+<article class="editorial-card" [class.featured]="featured">
+    <!-- Image -->
+    <a [routerLink]="['/blog', blog.id]" class="card-image-wrap">
+        <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" [alt]="blog.title" class="card-image">
+        <div *ngIf="!blog.coverImageUrl" class="card-image-placeholder">
+            <span class="material-icons" style="font-size: 2.5rem; opacity: 0.3;">auto_stories</span>
         </div>
+        <div class="card-badge" *ngIf="blog.category">{{ blog.category | uppercase }}</div>
     </a>
 
-    <div class="card-body">
-        <!-- Category + status -->
-        <div class="card-meta-top">
-            <span class="badge badge-primary" *ngIf="blog.category">{{ blog.category }}</span>
-            <span class="badge badge-warning" *ngIf="showActions && !blog.isPublished">Draft</span>
+    <div class="card-content">
+        <!-- Date / Metadata -->
+        <div class="card-meta">
+            <span class="meta-item">{{ blog.createdAt | date:'MMM dd, yyyy' | uppercase }}</span>
+
         </div>
 
         <!-- Title -->
-        <a [routerLink]="['/blog', blog.id]" class="card-title-link">
+        <a [routerLink]="['/blog', blog.id]" class="card-title-wrap">
             <h3 class="card-title">{{ blog.title }}</h3>
         </a>
 
-        <!-- Summary -->
-        <p class="card-summary" *ngIf="blog.summary">{{ blog.summary }}</p>
-
-        <!-- Tags -->
-        <div class="card-tags" *ngIf="getTags().length > 0">
-            <span class="tag" *ngFor="let tag of getTags()">{{ tag }}</span>
-        </div>
+        <!-- Summary (optional for grid, shown for featured) -->
+        <p class="card-excerpt" *ngIf="blog.summary">{{ blog.summary }}</p>
 
         <!-- Footer -->
         <div class="card-footer">
-            <div class="card-author">
-                <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName"
-                    class="author-avatar">
-                <span *ngIf="!blog.author.avatarUrl" class="author-avatar author-avatar-init">
-                    {{ getInitials(blog.author.fullName) }}
-                </span>
-                <span class="author-name">{{ blog.author.fullName }}</span>
+            <div class="author-info">
+                <span class="by">BY</span>
+                <span class="author-name">{{ blog.author.fullName | uppercase }}</span>
             </div>
+
             <div class="card-stats">
-                <span class="stat">👁 {{ blog.viewCount }}</span>
-                <span class="stat">❤ {{ blog.likeCount }}</span>
-                <span class="stat">{{ blog.readTimeMinutes }}m</span>
+                <span class="material-icons"
+                    style="font-size: 1.1rem; color: #ff4757; vertical-align: middle; cursor: default;">favorite</span>
+                <span class="stat-count">{{ blog.likeCount }}</span>
+                <span class="divider"></span>
+                <button class="save-btn" (click)="toggleSave($event)" [title]="blog.isSavedByCurrentUser ? 'Remove from Saved' : 'Save to Collection'">
+                    <span class="material-icons" [style.color]="blog.isSavedByCurrentUser ? '#d4af37' : 'inherit'">{{ blog.isSavedByCurrentUser ? 'bookmark' : 'bookmark_border' }}</span>
+                </button>
             </div>
         </div>
 
-        <!-- Actions (dashboard) -->
+        <!-- Dashboard Actions -->
         <div class="card-actions" *ngIf="showActions">
-            <button class="btn btn-outline btn-sm" (click)="onEdit.emit(blog.id)">✏ Edit</button>
-            <button class="btn btn-danger btn-sm" (click)="onDelete.emit(blog.id)">🗑 Delete</button>
+            <button class="action-link edit" (click)="$event.stopPropagation(); onEdit.emit(blog.id)">
+                <span class="material-icons"
+                    style="font-size: 1.1rem; vertical-align: middle; margin-right: 4px;">edit</span>
+                EDIT
+            </button>
+            <button class="action-link delete" (click)="$event.stopPropagation(); onDelete.emit(blog.id)">
+                <span class="material-icons"
+                    style="font-size: 1.1rem; vertical-align: middle; margin-right: 4px;">delete</span>
+                DELETE
+            </button>
         </div>
     </div>
 </article>

@@ -1,111 +1,108 @@
-<div class="page-wrapper">
+<div class="editorial-detail-wrapper">
     <!-- Loading -->
     <div class="loading-state" *ngIf="loading">
-        <div class="spinner" style="width:32px;height:32px;border-width:3px"></div>
+        <div class="editorial-spinner"></div>
     </div>
 
-    <div class="container detail-container" *ngIf="!loading && blog">
-        <!-- Back -->
-        <a routerLink="/" class="back-link">← Back to blogs</a>
+    <article class="editorial-article" *ngIf="!loading && blog">
+        <!-- Back Link -->
+        <nav class="article-nav container">
+            <a routerLink="/" class="editorial-back">
+                <span class="material-icons"
+                    style="vertical-align: middle; font-size: 1.2rem; margin-right: 4px;">arrow_back</span>
+                RETURN TO HOME
+            </a>
+        </nav>
 
-        <!-- Header -->
-        <header class="blog-header">
-            <div class="blog-meta">
-                <span class="badge badge-primary" *ngIf="blog.category">{{ blog.category }}</span>
-                <span class="text-muted">{{ blog.readTimeMinutes }} min read</span>
-                <span class="text-muted">·</span>
-                <span class="text-muted" *ngIf="blog.publishedAt">{{ formatDate(blog.publishedAt) }}</span>
+        <!-- Article Header -->
+        <header class="article-header container text-center">
+            <div class="article-category" *ngIf="blog.category">{{ blog.category | uppercase }}</div>
+            <h1 class="article-title">{{ blog.title }}</h1>
+            <div class="article-meta">
+                <span class="meta-item">BY {{ blog.author.fullName | uppercase }}</span>
+                <span class="meta-sep">/</span>
+                <span class="meta-item">{{ formatDate(blog.publishedAt || blog.createdAt) | uppercase }}</span>
+                <span class="meta-sep">/</span>
+                <span class="meta-item">{{ blog.readTimeMinutes }} MIN READ</span>
             </div>
-            <h1 class="blog-title">{{ blog.title }}</h1>
-
-            <!-- Author info -->
-            <div class="blog-author">
-                <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName"
-                    class="author-avatar">
-                <span *ngIf="!blog.author.avatarUrl" class="author-avatar author-avatar-init">
-                    {{ getInitials(blog.author.fullName) }}
-                </span>
-                <div>
-                    <div class="author-name">{{ blog.author.fullName }}</div>
-                    <div class="author-date text-muted">{{ formatDate(blog.createdAt) }}</div>
-                </div>
-            </div>
-
-            <!-- Cover image -->
-            <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" [alt]="blog.title" class="blog-cover">
         </header>
 
-        <!-- Content -->
-        <div class="blog-content" [innerHTML]="blog.content"></div>
-
-        <!-- Tags -->
-        <div class="blog-tags" *ngIf="getTags().length > 0">
-            <span class="tag" *ngFor="let tag of getTags()">{{ tag }}</span>
+        <!-- Cover Image (Full Width) -->
+        <div class="article-cover-wrap" *ngIf="blog.coverImageUrl">
+            <img [src]="blog.coverImageUrl" [alt]="blog.title" class="article-cover">
         </div>
 
-        <!-- Reactions bar -->
-        <div class="reactions-bar">
-            <button class="reaction-btn" [class.liked]="blog.isLikedByCurrentUser" (click)="toggleLike()"
-                [disabled]="likeLoading">
-                {{ blog.isLikedByCurrentUser ? '❤️' : '🤍' }}
-                <span>{{ blog.likeCount }}</span>
-            </button>
-            <span class="reaction-sep">·</span>
-            <span class="reaction-stat">💬 {{ blog.commentCount }} comment{{ blog.commentCount !== 1 ? 's' : ''
-                }}</span>
-            <span class="reaction-sep">·</span>
-            <span class="reaction-stat">👁 {{ blog.viewCount }} view{{ blog.viewCount !== 1 ? 's' : '' }}</span>
-        </div>
+        <!-- Article Content -->
+        <div class="article-body-container container">
+            <div class="article-body" [innerHTML]="blog.content"></div>
 
-        <!-- Comments section -->
-        <section class="comments-section">
-            <h2 class="comments-title">Comments ({{ blog.commentCount }})</h2>
+            <!-- Tags -->
+            <div class="article-tags" *ngIf="getTags().length > 0">
+                <span class="editorial-tag" *ngFor="let tag of getTags()">{{ tag | uppercase }}</span>
+            </div>
 
-            <!-- Add comment -->
-            <div class="add-comment" *ngIf="authService.isLoggedIn">
-                <img *ngIf="authService.currentUser?.avatarUrl" [src]="authService.currentUser?.avatarUrl"
-                    class="author-avatar">
-                <span *ngIf="!authService.currentUser?.avatarUrl" class="author-avatar author-avatar-init">
-                    {{ getInitials(authService.currentUser?.fullName || '') }}
-                </span>
-                <div class="comment-input-wrapper">
-                    <textarea class="form-control comment-textarea" [(ngModel)]="commentInput"
-                        placeholder="Add a comment…" rows="2"></textarea>
-                    <button class="btn btn-primary btn-sm" (click)="addComment()"
-                        [disabled]="!commentInput.trim() || commentLoading">
-                        <span class="spinner" *ngIf="commentLoading"></span>
-                        Post
+            <!-- Reactions -->
+            <footer class="article-footer">
+                <div class="engagement-bar">
+                    <button class="engagement-btn" [class.active]="blog.isLikedByCurrentUser" (click)="toggleLike()"
+                        [disabled]="likeLoading">
+                        <span class="icon">
+                            <span class="material-icons" style="font-size: 1.4rem;">{{ blog.isLikedByCurrentUser ?
+                                'favorite' : 'favorite_border' }}</span>
+                        </span>
+                        <span class="count">{{ blog.likeCount }}</span>
+                    </button>
+                    <div class="engagement-stat">
+                        <span class="icon">
+                            <span class="material-icons" style="font-size: 1.4rem;">visibility</span>
+                        </span>
+                        <span class="count">{{ blog.viewCount }}</span>
+                    </div>
+                    <button class="engagement-btn" [class.active]="blog.isSavedByCurrentUser" (click)="toggleSave()" 
+                        [title]="blog.isSavedByCurrentUser ? 'Remove from Saved' : 'Save to Collection'">
+                        <span class="icon">
+                            <span class="material-icons" style="font-size: 1.4rem;" [style.color]="blog.isSavedByCurrentUser ? '#d4af37' : 'inherit'">{{ blog.isSavedByCurrentUser ? 'bookmark' : 'bookmark_border' }}</span>
+                        </span>
+                        <span class="count">{{ blog.isSavedByCurrentUser ? 'SAVED' : 'SAVE' }}</span>
                     </button>
                 </div>
-            </div>
+            </footer>
 
-            <div class="login-to-comment" *ngIf="!authService.isLoggedIn">
-                <a routerLink="/auth/login">Sign in</a> to leave a comment
-            </div>
+            <!-- Comments -->
+            <section class="critiques-section">
+                <h2 class="critiques-title">Comments</h2>
 
-            <!-- Comment list -->
-            <div class="comment-list" *ngIf="comments.length > 0">
-                <div class="comment" *ngFor="let comment of comments">
-                    <img *ngIf="comment.author.avatarUrl" [src]="comment.author.avatarUrl" class="author-avatar">
-                    <span *ngIf="!comment.author.avatarUrl" class="author-avatar author-avatar-init">
-                        {{ getInitials(comment.author.fullName) }}
-                    </span>
-                    <div class="comment-body">
-                        <div class="comment-header">
-                            <span class="comment-author">{{ comment.author.fullName }}</span>
-                            <span class="comment-date text-muted">{{ formatDate(comment.createdAt) }}</span>
-                            <button *ngIf="authService.currentUser?.id === comment.author.id"
-                                class="btn btn-ghost btn-sm comment-delete"
-                                (click)="deleteComment(comment.id)">🗑</button>
+                <!-- Add Comment -->
+                <div class="critique-form" *ngIf="authService.isLoggedIn">
+                    <textarea class="editorial-textarea" [(ngModel)]="commentInput" placeholder="LEAVE A COMMENT..."
+                        rows="3"></textarea>
+                    <button class="editorial-btn-submit" (click)="addComment()"
+                        [disabled]="!commentInput.trim() || commentLoading">
+                        {{ commentLoading ? 'SUBMITTING...' : 'POST COMMENTS' }}
+                    </button>
+                </div>
+
+                <div class="login-prompt" *ngIf="!authService.isLoggedIn">
+                    <a routerLink="/auth/login">AUTHENTICATE</a> TO PARTICIPATE IN THE CONVERSATION.
+                </div>
+
+                <!-- Comment List -->
+                <div class="critique-list" *ngIf="comments.length > 0">
+                    <div class="critique-item" *ngFor="let comment of comments">
+                        <div class="critique-header">
+                            <span class="critique-author">{{ comment.author.fullName | uppercase }}</span>
+                            <span class="critique-date">{{ formatDate(comment.createdAt) | uppercase }}</span>
+                            <button *ngIf="authService.currentUser?.id === comment.author.id" class="critique-delete"
+                                (click)="deleteComment(comment.id)">REMOVE</button>
                         </div>
-                        <p class="comment-content">{{ comment.content }}</p>
+                        <p class="critique-content">{{ comment.content }}</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="empty-state" style="padding:40px 0" *ngIf="comments.length === 0">
-                <p class="text-muted">No comments yet. Be the first!</p>
-            </div>
-        </section>
-    </div>
+                <div class="empty-critiques" *ngIf="comments.length === 0">
+                    <p>No comments have been shared yet.</p>
+                </div>
+            </section>
+        </div>
+    </article>
 </div>

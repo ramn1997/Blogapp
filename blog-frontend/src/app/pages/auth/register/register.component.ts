@@ -44,12 +44,14 @@ export class RegisterComponent implements OnInit {
           client_id: environment.googleClientId,
           callback: (response: any) => this.handleGoogleCallback(response)
         });
-        google.accounts.id.renderButton(
-          document.getElementById('google-register-btn'),
-          { theme: 'outline', size: 'large', width: '100%', text: 'signup_with' }
-        );
       }
     }, 500);
+  }
+
+  triggerGoogleLogin(): void {
+    if (typeof google !== 'undefined') {
+      google.accounts.id.prompt();
+    }
   }
 
   private handleGoogleCallback(response: any): void {
@@ -68,40 +70,6 @@ export class RegisterComponent implements OnInit {
         this.error = err?.error?.message || 'Google sign-up failed.';
         this.loading = false;
       }
-    });
-  }
-
-  signUpWithMicrosoft(): void {
-    import('@azure/msal-browser').then(({ PublicClientApplication }) => {
-      const msalApp = new PublicClientApplication({
-        auth: {
-          clientId: environment.microsoftClientId,
-          authority: `https://login.microsoftonline.com/${environment.microsoftTenantId}`,
-          redirectUri: window.location.origin
-        }
-      });
-
-      msalApp.initialize().then(() => {
-        return msalApp.loginPopup({ scopes: ['openid', 'profile', 'email'] });
-      }).then((result: any) => {
-        this.loading = true;
-        this.authService.oauthLogin({
-          provider: 'microsoft',
-          idToken: result.idToken,
-          email: result.account.username,
-          fullName: result.account.name || result.account.username,
-          avatarUrl: undefined,
-          providerId: result.account.homeAccountId
-        }).subscribe({
-          next: () => this.router.navigate(['/']),
-          error: (err: any) => {
-            this.error = err?.error?.message || 'Microsoft sign-up failed.';
-            this.loading = false;
-          }
-        });
-      }).catch(() => {
-        this.error = 'Microsoft sign-up was cancelled or failed.';
-      });
     });
   }
 

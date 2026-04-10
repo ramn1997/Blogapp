@@ -55,6 +55,17 @@ export class BlogDetailComponent implements OnInit {
     });
   }
 
+  toggleSave(): void {
+    if (!this.blog || !this.authService.isLoggedIn) {
+      this.router.navigate(['/auth/login']); return;
+    }
+    this.blogService.toggleSave(this.blog.id).subscribe(res => {
+      if (this.blog) {
+        this.blog.isSavedByCurrentUser = res.saved;
+      }
+    });
+  }
+
   addComment(): void {
     if (!this.commentInput.trim() || !this.blog) return;
     if (!this.authService.isLoggedIn) { this.router.navigate(['/auth/login']); return; }

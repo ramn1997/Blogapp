@@ -19,6 +19,26 @@ export class BlogWriteComponent implements OnInit {
   editId: number | null = null;
   categories = CATEGORIES;
   isEditMode = false;
+  uploading = false;
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploading = true;
+      this.blogService.uploadImage(file).subscribe({
+        next: (res) => {
+          const currentContent = this.form.get('content')?.value || '';
+          const imageHtml = `\n<img src="${res.url}" alt="image" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;">\n`;
+          this.form.get('content')?.setValue(currentContent + imageHtml);
+          this.uploading = false;
+        },
+        error: (err) => {
+          this.error = 'Failed to upload image.';
+          this.uploading = false;
+        }
+      });
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -84,5 +104,12 @@ export class BlogWriteComponent implements OnInit {
   wordCount(): number {
     const content = this.form.value.content || '';
     return content.split(/\s+/).filter(Boolean).length;
+  }
+
+  onCancel(): void {
+    if (this.form.dirty) {
+      if (!confirm('Discard changes?')) return;
+    }
+    this.router.navigate(['/dashboard']);
   }
 }

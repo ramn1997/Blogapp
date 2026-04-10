@@ -37,15 +37,34 @@
     border: 1px solid var(--border);
 }
 
-.content-label-row {
+.content-header-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+}
+
+.content-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.content-toolbar .btn-ghost {
+    padding: 4px 12px;
+    height: auto;
+    font-size: 0.85rem;
+    border: 1px dashed var(--border);
+}
+
+.content-toolbar .btn-ghost:hover {
+    border-style: solid;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .word-count {
     font-size: 0.78rem;
+    opacity: 0.7;
 }
 
 .content-area {

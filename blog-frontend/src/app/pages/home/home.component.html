@@ -1,57 +1,43 @@
-<div class="page-wrapper">
-    <!-- Hero section -->
-    <section class="hero">
-        <div class="container">
-            <h1 class="hero-title">Ideas worth sharing</h1>
-            <p class="hero-subtitle">
-                Discover thoughtful writing on technology, design, science, and more.
-            </p>
+<div class="narrative-wrapper" style="padding-top: 40px;">
+    <!-- Archive Feed / Search Results -->
+    <main class="archives-container container">
+        <div class="loading-state" *ngIf="loading">
+            <div class="editorial-spinner"></div>
+        </div>
 
-            <!-- Search -->
-            <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" placeholder="Search blogs, topics, authors…"
-                    [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
-                <button class="btn btn-primary btn-sm" (click)="onSearch()">Search</button>
+        <div class="search-results-header" *ngIf="searchQuery && !loading" style="margin-bottom: 30px;">
+            <h1 class="serif" style="font-size: 2.5rem;">Results for "{{ searchQuery }}"</h1>
+        </div>
+
+        <div class="editorial-grid" *ngIf="!loading">
+            <div *ngFor="let blog of blogs; let i = index" [class.featured-item]="i === 0 && !searchQuery">
+                <app-blog-card [blog]="blog" [featured]="i === 0 && !searchQuery"></app-blog-card>
             </div>
         </div>
-    </section>
 
-    <!-- Content -->
-    <div class="container">
-        <!-- Category filters -->
-        <div class="categories-bar" *ngIf="categories.length > 0">
-            <button class="category-pill" [class.active]="selectedCategory === ''"
-                (click)="selectCategory('')">All</button>
-            <button *ngFor="let cat of categories" class="category-pill" [class.active]="selectedCategory === cat"
-                (click)="selectCategory(cat)">{{ cat }}</button>
-        </div>
-
-        <!-- Loading -->
-        <div class="loading-state" *ngIf="loading">
-            <div class="spinner" style="width:28px;height:28px;border-width:3px"></div>
-            <span class="text-muted" style="margin-left:12px">Loading posts…</span>
-        </div>
-
-        <!-- Blog grid -->
-        <div class="blog-grid" *ngIf="!loading && blogs.length > 0">
-            <app-blog-card *ngFor="let blog of blogs" [blog]="blog"></app-blog-card>
-        </div>
-
-        <!-- Empty state -->
-        <div class="empty-state" *ngIf="!loading && blogs.length === 0">
-            <div class="empty-state-icon">📝</div>
-            <h3>No posts found</h3>
-            <p>Try a different search query or category</p>
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!loading && blogs.length === 0" style="padding: 100px 0; text-align: center;">
+            <span class="material-icons" style="font-size: 4rem; color: #eee; margin-bottom: 20px;">search_off</span>
+            <h3 class="serif">No entries found.</h3>
+            <p class="text-muted">The archives are silent on this topic.</p>
         </div>
 
         <!-- Pagination -->
-        <div class="pagination" *ngIf="!loading && totalPages > 1">
-            <button class="page-btn" [disabled]="currentPage === 1" (click)="loadBlogs(currentPage - 1)">←</button>
-            <button *ngFor="let page of getPages()" class="page-btn" [class.active]="currentPage === page"
-                (click)="loadBlogs(page)">{{ page }}</button>
-            <button class="page-btn" [disabled]="currentPage === totalPages"
-                (click)="loadBlogs(currentPage + 1)">→</button>
+        <nav class="archives-pagination" *ngIf="!loading && totalPages > 1" style="margin-top: 60px;">
+            <button (click)="loadBlogs(currentPage - 1)" [disabled]="currentPage === 1">
+                <span class="material-icons">chevron_left</span>
+            </button>
+            <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+            <button (click)="loadBlogs(currentPage + 1)" [disabled]="currentPage === totalPages">
+                <span class="material-icons">chevron_right</span>
+            </button>
+        </nav>
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer container" style="margin-top: 100px; padding: 40px 0; border-top: 1px solid #eee;">
+        <div class="footer-right">
+            <span class="copyright">© 2026 Scribeflow. All rights reserved.</span>
         </div>
-    </div>
+    </footer>
 </div>

@@ -37,6 +37,7 @@ namespace BlogApp.API.DTOs.Blog
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
         public bool IsLikedByCurrentUser { get; set; }
+        public bool IsSavedByCurrentUser { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? PublishedAt { get; set; }
         public AuthorDto Author { get; set; } = null!;

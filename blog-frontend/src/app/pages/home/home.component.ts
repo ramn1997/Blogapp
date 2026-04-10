@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Blog, BlogListResponse } from '../../models';
 import { BlogService } from '../../services/blog.service';
 
@@ -18,11 +19,17 @@ export class HomeComponent implements OnInit {
   selectedCategory = '';
   pageSize = 9;
 
-  constructor(private blogService: BlogService) { }
+  constructor(
+    private blogService: BlogService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
     this.loadCategories();
-    this.loadBlogs();
+    this.route.queryParams.subscribe(params => {
+      this.searchQuery = params['q'] || '';
+      this.loadBlogs(1);
+    });
   }
 
   loadCategories(): void {

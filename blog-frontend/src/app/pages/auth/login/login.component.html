@@ -1,72 +1,72 @@
-<div class="auth-page">
-    <div class="auth-card">
-        <!-- Header -->
-        <div class="auth-header">
-            <a routerLink="/" class="auth-brand">
-                <span class="brand-icon">✦</span> ThoughtStream
-            </a>
-            <h1 class="auth-title">Welcome back</h1>
-            <p class="auth-subtitle">Sign in to continue writing and reading</p>
-        </div>
+<div class="auth-page-wrapper">
 
-        <!-- Error alert -->
-        <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+    <!-- Sign In Card -->
+    <main class="auth-card">
+        <h2 class="card-title">Welcome Back</h2>
+        <p class="card-subtitle">Enter your credentials to access your account.</p>
 
-        <!-- OAuth buttons -->
-        <div class="oauth-section">
-            <!-- Rendered by Google GSI SDK -->
-            <div id="google-btn" class="google-btn-wrapper"></div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+            <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
-            <button class="btn btn-microsoft w-full" (click)="signInWithMicrosoft()">
-                <svg width="18" height="18" viewBox="0 0 21 21" fill="none">
-                    <rect x="1" y="1" width="9" height="9" fill="#f25022" />
-                    <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
-                    <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
-                    <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
-                </svg>
-                Continue with Microsoft
-            </button>
-        </div>
-
-        <!-- Divider -->
-        <div class="divider">or sign in with email</div>
-
-        <!-- Form -->
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="form-group">
-                <label class="form-label" for="email">Email address</label>
-                <input id="email" type="email" formControlName="email" class="form-control"
-                    [class.is-invalid]="f['email'].touched && f['email'].invalid" placeholder="you@example.com"
-                    autocomplete="email">
-                <div class="field-error" *ngIf="f['email'].touched && f['email'].errors?.['required']">Email is required
+                <div class="label-row">
+                    <label class="form-label">EMAIL ADDRESS</label>
                 </div>
-                <div class="field-error" *ngIf="f['email'].touched && f['email'].errors?.['email']">Enter a valid email
+                <div class="form-input-wrap">
+                    <input type="email" formControlName="email" class="form-input" placeholder="name@example.com"
+                        autocomplete="email">
+                    <div class="field-error"
+                        *ngIf="f['email'].touched && (f['email'].errors?.['required'] || f['email'].errors?.['email'])">
+                        Enter a valid email
+                    </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <div class="input-with-icon">
-                    <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
-                        class="form-control" [class.is-invalid]="f['password'].touched && f['password'].invalid"
+                <div class="label-row">
+                    <label class="form-label">PASSWORD</label>
+                    <button type="button" class="forgot-link">FORGOT PASSWORD?</button>
+                </div>
+                <div class="form-input-wrap">
+                    <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="form-input"
                         placeholder="••••••••" autocomplete="current-password">
-                    <button type="button" class="icon-btn" (click)="showPassword = !showPassword" tabindex="-1">
+                    <button type="button" class="toggle-pwd" (click)="showPassword = !showPassword">
                         {{ showPassword ? '🙈' : '👁' }}
                     </button>
+                    <div class="field-error" *ngIf="f['password'].touched && f['password'].errors?.['required']">
+                        Password is required
+                    </div>
                 </div>
-                <div class="field-error" *ngIf="f['password'].touched && f['password'].errors?.['required']">Password is
-                    required</div>
             </div>
 
-            <button class="btn btn-primary w-full" type="submit" [disabled]="loading" style="margin-top:8px">
+            <button class="btn-signin" type="submit" [disabled]="loading">
                 <span class="spinner" *ngIf="loading"></span>
-                {{ loading ? 'Signing in…' : 'Sign in' }}
+                {{ loading ? 'SIGNING IN...' : 'SIGN IN' }}
             </button>
         </form>
 
-        <!-- Footer links -->
-        <p class="auth-footer">
-            Don't have an account? <a routerLink="/auth/register">Create one</a>
-        </p>
-    </div>
+        <div class="social-divider">
+            <span>OR CONTINUE WITH</span>
+        </div>
+
+        <div class="social-grid single-social">
+            <button type="button" class="social-btn" (click)="triggerGoogleLogin()">
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="G" class="social-icon">
+                GOOGLE
+            </button>
+        </div>
+
+        <footer class="card-footer">
+            <span>New to the gallery? </span>
+            <a routerLink="/auth/register">Create an account</a>
+        </footer>
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="page-footer">
+        © 2026 SCRIBEFLOW. RESERVED EXCELLENCE.
+    </footer>
+
+    <!-- Hidden element for Google SDK rendering if needed -->
+    <div id="google-btn-hidden" style="display: none;"></div>
 </div>

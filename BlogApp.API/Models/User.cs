@@ -37,5 +37,6 @@ namespace BlogApp.API.Models
         public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<BlogLike> BlogLikes { get; set; } = new List<BlogLike>();
+        public ICollection<SavedBlog> SavedBlogs { get; set; } = new List<SavedBlog>();
     }
 }

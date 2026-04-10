@@ -49,6 +49,7 @@ export interface Blog {
     likeCount: number;
     commentCount: number;
     isLikedByCurrentUser: boolean;
+    isSavedByCurrentUser: boolean;
     createdAt: string;
     publishedAt?: string;
     author: Author;

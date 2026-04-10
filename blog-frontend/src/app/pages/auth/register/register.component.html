@@ -1,85 +1,77 @@
-<div class="auth-page">
-    <div class="auth-card">
-        <div class="auth-header">
-            <a routerLink="/" class="auth-brand">
-                <span class="brand-icon">✦</span> ThoughtStream
-            </a>
-            <h1 class="auth-title">Create your account</h1>
-            <p class="auth-subtitle">Start writing and sharing your thoughts</p>
-        </div>
+<div class="auth-page-wrapper">
 
-        <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
-        <!-- OAuth -->
-        <div class="oauth-section">
-            <div id="google-register-btn" class="google-btn-wrapper"></div>
-            <button class="btn btn-microsoft w-full" (click)="signUpWithMicrosoft()">
-                <svg width="18" height="18" viewBox="0 0 21 21" fill="none">
-                    <rect x="1" y="1" width="9" height="9" fill="#f25022" />
-                    <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
-                    <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
-                    <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
-                </svg>
-                Sign up with Microsoft
-            </button>
-        </div>
+    <!-- Sign Up Card -->
+    <main class="auth-card">
+        <h2 class="card-title">Join Us</h2>
+        <p class="card-subtitle">Begin your journey into deep-form journalism and refined storytelling.</p>
 
-        <div class="divider">or register with email</div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+            <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="form-group">
-                <label class="form-label">Full name</label>
-                <input type="text" formControlName="fullName" class="form-control"
-                    [class.is-invalid]="f['fullName'].touched && f['fullName'].invalid" placeholder="Jane Smith"
+                <label class="form-label">FULL NAME</label>
+                <input type="text" formControlName="fullName" class="form-input" placeholder="Arthur Rimbaud"
                     autocomplete="name">
                 <div class="field-error" *ngIf="f['fullName'].touched && f['fullName'].errors?.['required']">Full name
                     is required</div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Email address</label>
-                <input type="email" formControlName="email" class="form-control"
-                    [class.is-invalid]="f['email'].touched && f['email'].invalid" placeholder="you@example.com"
+                <label class="form-label">EMAIL ADDRESS</label>
+                <input type="email" formControlName="email" class="form-input" placeholder="muse@editorial.com"
                     autocomplete="email">
-                <div class="field-error" *ngIf="f['email'].touched && f['email'].errors?.['required']">Email is required
-                </div>
-                <div class="field-error" *ngIf="f['email'].touched && f['email'].errors?.['email']">Enter a valid email
+                <div class="field-error"
+                    *ngIf="f['email'].touched && (f['email'].errors?.['required'] || f['email'].errors?.['email'])">
+                    Enter a valid email
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">
-                    Preferred email
-                    <span class="label-hint">(optional — for notifications)</span>
-                </label>
-                <input type="email" formControlName="preferredEmail" class="form-control" placeholder="alt@example.com"
-                    autocomplete="off">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="input-with-icon">
-                    <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="form-control"
-                        [class.is-invalid]="f['password'].touched && f['password'].invalid"
-                        placeholder="Min. 6 characters" autocomplete="new-password">
-                    <button type="button" class="icon-btn" (click)="showPassword = !showPassword" tabindex="-1">
+                <label class="form-label">PASSWORD</label>
+                <div class="form-input-wrap">
+                    <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="form-input"
+                        placeholder="••••••••" autocomplete="new-password">
+                    <button type="button" class="toggle-pwd" (click)="showPassword = !showPassword"
+                        style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;">
                         {{ showPassword ? '🙈' : '👁' }}
                     </button>
+                    <div class="field-error"
+                        *ngIf="f['password'].touched && (f['password'].errors?.['required'] || f['password'].errors?.['minlength'])">
+                        At least 6 characters
+                    </div>
                 </div>
-                <div class="field-error" *ngIf="f['password'].touched && f['password'].errors?.['required']">Password is
-                    required</div>
-                <div class="field-error" *ngIf="f['password'].touched && f['password'].errors?.['minlength']">At least 6
-                    characters</div>
             </div>
 
-            <button class="btn btn-primary w-full" type="submit" [disabled]="loading" style="margin-top:8px">
+            <button class="btn-signin" type="submit" [disabled]="loading">
                 <span class="spinner" *ngIf="loading"></span>
-                {{ loading ? 'Creating account…' : 'Create account' }}
+                {{ loading ? 'CREATING...' : 'CREATE ACCOUNT' }}
             </button>
+
+            <!-- Hidden field to keep form structure consistent -->
+            <input type="hidden" formControlName="preferredEmail">
         </form>
 
-        <p class="auth-footer">
-            Already have an account? <a routerLink="/auth/login">Sign in</a>
-        </p>
-    </div>
+        <div class="social-divider">
+            <span>OR CONTINUE WITH</span>
+        </div>
+
+        <div class="social-grid single-social">
+            <button type="button" class="social-btn" (click)="triggerGoogleLogin()">
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="G" class="social-icon">
+                GOOGLE
+            </button>
+        </div>
+
+        <footer class="card-footer">
+            <span>Already a member? </span>
+            <a routerLink="/auth/login">Sign In</a>
+        </footer>
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="page-footer">
+        © 2026 SCRIBEFLOW. RESERVED EXCELLENCE.
+    </footer>
+
 </div>
