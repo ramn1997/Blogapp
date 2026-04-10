@@ -1,8 +1,8 @@
-# ✦ Scribeflow — Full-Stack Editorial Blog Platform
+# Scribeflow — Full-Stack Editorial Blog Platform
 
 A modern, magazine-inspired blogging platform built with **Angular 19** + **ASP.NET Core 10** + **SQL Server**, featuring a minimalist aesthetic and Google OAuth authentication.
 
-## 🌐 Live URLs
+## Live URLs
 
 *   **Frontend**: [https://ramn1997.github.io/Blogapp/](https://ramn1997.github.io/Blogapp/)
 *   **Backend (API)**: [http://localhost:5000](http://localhost:5000) (Local)
@@ -10,7 +10,7 @@ A modern, magazine-inspired blogging platform built with **Angular 19** + **ASP.
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```
 BlogApp/
@@ -35,34 +35,34 @@ BlogApp/
 └── docker-compose.yml    # API + SQL Server stack
 ```
 
-## 🔑 Features
+## Features
 
 - **Authentication**
-  - ✅ Register with email + password + preferred email
-  - ✅ Login with email + password
-  - ✅ **Google OAuth** (via Google Identity Services SDK)
-  - ✅ JWT tokens with 7-day expiry
+  - Register with email + password + preferred email
+  - Login with email + password
+  - **Google OAuth** (via Google Identity Services SDK)
+  - JWT tokens with 7-day expiry
 - **Blog Content**
-  - ✅ Create/edit/delete posts
-  - ✅ **In-content Image Uploads**: Upload and embed images directly in your stories.
-  - ✅ Draft vs. published status
-  - ✅ Categories and tags
-  - ✅ Auto-calculated read time
-  - ✅ Full-text search + category filter
-  - ✅ Pagination
+  - Create/edit/delete posts
+  - **In-content Image Uploads**: Upload and embed images directly in your stories.
+  - Draft vs. published status
+  - Categories and tags
+  - Auto-calculated read time
+  - Full-text search + category filter
+  - Pagination
 - **Engagement & Personalization**
-  - ✅ **Saved Collections**: Bookmark articles to read later.
-  - ✅ Like/unlike posts
-  - ✅ Comments with delete
-  - ✅ View count tracking
-  - ✅ Profile dashboard with tabbed views (My Blogs, Saved, Drafts)
+  - **Saved Collections**: Bookmark articles to read later.
+  - Like/unlike posts
+  - Comments with delete
+  - View count tracking
+  - Profile dashboard with tabbed views (My Blogs, Saved, Drafts)
 - **Deployment**
-  - ✅ API → Docker image → GitHub Container Registry (GHCR)
-  - ✅ Frontend → GitHub Pages via GitHub Actions
+  - API -> Docker image -> GitHub Container Registry (GHCR)
+  - Frontend -> GitHub Pages via GitHub Actions
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Prerequisites
 - .NET 10 SDK
@@ -119,27 +119,27 @@ ng serve                    # Opens http://localhost:4200
 
 ---
 
-## 🔐 OAuth Setup
+## OAuth Setup
 
 ### Google OAuth
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create or select a project
-3. Navigate to **APIs & Services → OAuth 2.0 Client IDs**
+3. Navigate to **APIs & Services -> OAuth 2.0 Client IDs**
 4. Create a **Web application** credential
 5. Add authorized origins: `http://localhost:4200`
-6. Copy the **Client ID** → `googleClientId` in environment.ts
+6. Copy the **Client ID** -> `googleClientId` in environment.ts
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
-### 🔴 Public vs. Local
+### Public vs. Local
 *   **Local Build**: By default, the `docker-compose.yml` is configured to build the image locally from source.
 *   **Public Image**: The GitHub Actions push the container to **GitHub Container Registry (GHCR)**. To make this image public:
-    1. Go to your GitHub profile → **Packages**.
+    1. Go to your GitHub profile -> **Packages**.
     2. Select `blogapp-api`.
     3. Go to **Package Settings**.
-    4. Scroll to "Danger Zone" and click **Change visibility** → **Public**.
+    4. Scroll to "Danger Zone" and click **Change visibility** -> **Public**.
 
 ### Build and push API to GHCR manually
 
@@ -160,48 +160,48 @@ This starts:
 
 ---
 
-## 🚀 GitHub Actions CI/CD
+## GitHub Actions CI/CD
 
 The workflow (`.github/workflows/ci-cd.yml`) runs on push to `main`:
 
-1. **Build API** → Creates Docker image → Pushes to `ghcr.io/ramn1997/blogapp-api`
-2. **Build Frontend** → `ng build` → Deploys to **GitHub Pages**
+1. **Build API** -> Creates Docker image -> Pushes to `ghcr.io/ramn1997/blogapp-api`
+2. **Build Frontend** -> `ng build` -> Deploys to **GitHub Pages**
 
 ### Setup
 1. Push this repo to GitHub.
-2. Go to **Settings → Pages → Source**: `gh-pages` branch.
+2. Go to **Settings -> Pages -> Source**: `gh-pages` branch.
 3. Ensure your GitHub Action has `write` permissions to deploy.
 
 ---
 
-## 📋 API Reference
+## API Reference
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `POST` | `/api/auth/register` | ❌ | Register |
-| `POST` | `/api/auth/login` | ❌ | Login |
-| `POST` | `/api/auth/oauth` | ❌ | Google SSO |
-| `GET` | `/api/auth/profile` | ✅ | Get profile |
-| `PUT` | `/api/auth/profile` | ✅ | Update profile |
-| `GET` | `/api/blogs` | ❌ | List blogs |
-| `GET` | `/api/blogs/{id}` | ❌ | Get blog |
-| `POST` | `/api/blogs` | ✅ | Create blog |
-| `PUT` | `/api/blogs/{id}` | ✅ | Update blog |
-| `DELETE` | `/api/blogs/{id}` | ✅ | Delete blog |
-| `GET` | `/api/blogs/my` | ✅ | My blogs |
-| `POST` | `/api/blogs/{id}/like` | ✅ | Toggle like |
-| `GET` | `/api/blogs/{id}/comments` | ❌ | Get comments |
-| `POST` | `/api/blogs/{id}/comments` | ✅ | Add comment |
-| `DELETE` | `/api/blogs/{id}/comments/{cid}` | ✅ | Delete comment |
+| `POST` | `/api/auth/register` | No | Register |
+| `POST` | `/api/auth/login` | No | Login |
+| `POST` | `/api/auth/oauth` | No | Google SSO |
+| `GET` | `/api/auth/profile` | Yes | Get profile |
+| `PUT` | `/api/auth/profile` | Yes | Update profile |
+| `GET` | `/api/blogs` | No | List blogs |
+| `GET` | `/api/blogs/{id}` | No | Get blog |
+| `POST` | `/api/blogs` | Yes | Create blog |
+| `PUT` | `/api/blogs/{id}` | Yes | Update blog |
+| `DELETE` | `/api/blogs/{id}` | Yes | Delete blog |
+| `GET` | `/api/blogs/my` | Yes | My blogs |
+| `POST` | `/api/blogs/{id}/like` | Yes | Toggle like |
+| `GET` | `/api/blogs/{id}/comments` | No | Get comments |
+| `POST` | `/api/blogs/{id}/comments` | Yes | Add comment |
+| `DELETE` | `/api/blogs/{id}/comments/{cid}` | Yes | Delete comment |
 
 Full Swagger docs at: `http://localhost:5000/swagger`
 
 ---
 
-## 🎨 Design System
+## Design System
 
-- **Dark theme** by default
-- **Inter** font from Google Fonts
+- Dark theme by default
+- Inter font from Google Fonts
 - CSS custom properties for consistent tokens
 - Responsive grid layout
 - Subtle hover effects (not overly animated)
