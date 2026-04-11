@@ -42,6 +42,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:4200",
                 "https://localhost:4200",
+                "https://ramn1997.github.io",
                 builder.Configuration["Frontend:Url"] ?? "http://localhost:4200"
             )
             .AllowAnyHeader()
