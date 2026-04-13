@@ -23,17 +23,35 @@
         <!-- Summary (optional for grid, shown for featured) -->
         <p class="card-excerpt" *ngIf="blog.summary">{{ blog.summary }}</p>
 
+        <!-- Tags -->
+        <div class="card-tags" *ngIf="getTags().length > 0">
+            <a [routerLink]="['/']" [queryParams]="{ q: tag }" class="card-tag" *ngFor="let tag of getTags()" (click)="$event.stopPropagation()">#{{ tag | lowercase }}</a>
+        </div>
+
         <!-- Footer -->
         <div class="card-footer">
-            <div class="author-info">
-                <span class="by">BY</span>
-                <span class="author-name">{{ blog.author.fullName | uppercase }}</span>
+            <div class="author-layout">
+                <a class="author-avatar-wrap" [routerLink]="['/profile']" [queryParams]="{userId: blog.author.id}" (click)="$event.stopPropagation()">
+                    <div class="avatar-stack">
+                        <span class="material-icons author-fallback-icon">account_circle</span>
+                        <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName" 
+                            class="author-mini-photo" loading="eager">
+                    </div>
+                </a>
+                <div class="author-info">
+                    <span class="by">BY</span>
+                    <a class="author-name" [routerLink]="['/profile']" [queryParams]="{userId: blog.author.id}" (click)="$event.stopPropagation()">{{ blog.author.fullName | uppercase }}</a>
+                </div>
             </div>
 
             <div class="card-stats">
                 <span class="material-icons"
                     style="font-size: 1.1rem; color: #ff4757; vertical-align: middle; cursor: default;">favorite</span>
                 <span class="stat-count">{{ blog.likeCount }}</span>
+                <span class="divider"></span>
+                <span class="material-icons"
+                    style="font-size: 1rem; color: #888; vertical-align: middle; cursor: default;">chat_bubble_outline</span>
+                <span class="stat-count">{{ blog.commentCount }}</span>
                 <span class="divider"></span>
                 <button class="save-btn" (click)="toggleSave($event)" [title]="blog.isSavedByCurrentUser ? 'Remove from Saved' : 'Save to Collection'">
                     <span class="material-icons" [style.color]="blog.isSavedByCurrentUser ? '#d4af37' : 'inherit'">{{ blog.isSavedByCurrentUser ? 'bookmark' : 'bookmark_border' }}</span>

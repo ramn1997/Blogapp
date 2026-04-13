@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { combineLatest, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { BlogService } from '../../services/blog.service';
-import { User, Blog } from '../../models';
+import { Blog, User } from '../../models';
 
 @Component({
   standalone: false,
@@ -10,101 +12,164 @@ import { User, Blog } from '../../models';
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   user: User | null = null;
-  loading = false;
-  success = '';
-  error = '';
-  
+  currentUser: User | null = null;
+  isOwnProfile = false;
   isEditing = false;
-  activeTab = 'posts';
-  myBlogs: Blog[] = [];
-  savedBlogs: Blog[] = [];
-  drafts: Blog[] = [];
+  loading = true;
+  successMessage = '';
+  error = '';
+  activeTab = 'stories';
+  
+  blogs: Blog[] = [];
   stats = { stories: 0, following: 0 };
 
+  private sub!: Subscription;
+  private lastLoadedUserId: number | null = null;
+
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private authService: AuthService,
-    private blogService: BlogService
+    private blogService: BlogService,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.currentUser;
-    this.initForm();
-    this.loadMyBlogs();
-    this.loadSavedBlogs();
-    this.loadDrafts();
-  }
-
-  private initForm(): void {
-    this.form = this.fb.group({
-      fullName: [this.user?.fullName || '', Validators.required],
-      bio: [this.user?.bio || ''],
-      preferredEmail: [this.user?.preferredEmail || '', Validators.email],
-      avatarUrl: [this.user?.avatarUrl || '']
+    this.sub = combineLatest([
+      this.route.queryParams,
+      this.authService.currentUser$
+    ]).subscribe(([params, user]) => {
+      this.currentUser = user;
+      const userIdParam = params['userId'];
+      
+      if (userIdParam) {
+        const targetId = Number(userIdParam);
+        // Only reload if viewing a different user
+        if (this.lastLoadedUserId !== targetId) {
+          this.loadPublicProfile(targetId);
+        }
+      } else if (this.currentUser) {
+        // Own profile — only reload if we weren't already showing it
+        if (this.lastLoadedUserId !== this.currentUser.id) {
+          this.user = this.currentUser;
+          this.isOwnProfile = true;
+          this.lastLoadedUserId = this.currentUser.id;
+          this.initForm();
+          this.loadUserBlogs();
+          this.loading = false;
+        }
+      } else if (this.authService.isLoggedIn) {
+        // Token exists but user not yet loaded from storage — wait
+      } else {
+        this.router.navigate(['/auth/login']);
+      }
+      
+      this.checkProfileOwnership();
     });
   }
 
-  loadMyBlogs(): void {
-    this.blogService.getMyBlogs(1, 100, true).subscribe({
-      next: (res) => {
-        this.myBlogs = res.items;
+  ngOnDestroy(): void {
+    if (this.sub) {
+      this.sub.unsubscribe();
+    }
+  }
+
+  private checkProfileOwnership(): void {
+    if (this.user && this.currentUser) {
+      this.isOwnProfile = this.user.id === this.currentUser.id;
+    }
+  }
+
+  loadPublicProfile(userId: number): void {
+    this.loading = true;
+    this.lastLoadedUserId = userId;
+    this.authService.getUserProfile(userId).subscribe({
+      next: (user) => {
+        this.user = user;
+        this.checkProfileOwnership();
+        this.loadUserBlogs(userId);
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'User not found';
+        this.loading = false;
+      }
+    });
+  }
+
+  loadUserBlogs(userId?: number): void {
+    const id = userId || this.user?.id;
+    if (!id) return;
+
+    if (this.isOwnProfile) {
+      // Use the authenticated /my endpoint for own profile — guaranteed correct
+      this.blogService.getMyBlogs(1, 20, true).subscribe(res => {
+        this.blogs = res.items;
         this.stats.stories = res.totalCount;
-      }
-    });
+      });
+    } else {
+      // Public profile — filter by userId
+      this.blogService.getBlogs(1, 20, undefined, undefined, id).subscribe(res => {
+        this.blogs = res.items;
+        this.stats.stories = res.totalCount;
+      });
+    }
   }
 
-  loadSavedBlogs(): void {
-    this.blogService.getSavedBlogs(1, 100).subscribe({
-      next: (res) => {
-        this.savedBlogs = res.items;
-        this.stats.following = res.totalCount;
-      }
-    });
-  }
-
-  loadDrafts(): void {
-    this.blogService.getMyBlogs(1, 100, false).subscribe({
-      next: (res) => {
-        this.drafts = res.items;
-      }
-    });
-  }
-
-  switchTab(tab: string): void {
+  setTab(tab: string): void {
     this.activeTab = tab;
-    if (tab === 'posts') this.loadMyBlogs();
-    else if (tab === 'saved') this.loadSavedBlogs();
-    else this.loadDrafts();
+    if (tab === 'stories') {
+      this.loadUserBlogs();
+    } else if (tab === 'activity') {
+      this.blogService.getSavedBlogs().subscribe(res => this.blogs = res.items);
+    } else if (tab === 'drafts') {
+      this.blogService.getMyBlogs(1, 20, false).subscribe(res => this.blogs = res.items);
+    }
+  }
+
+  initForm(): void {
+    if (!this.user) return;
+    this.form = this.fb.group({
+      fullName: [this.user.fullName, [Validators.required]],
+      email: [this.user.email, [Validators.required, Validators.email]],
+      bio: [this.user.bio || '']
+    });
+  }
+
+  onAvatarChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.blogService.uploadImage(file).subscribe(res => {
+        this.authService.updateProfile({ avatarUrl: res.url }).subscribe(user => {
+          this.user = user;
+          this.successMessage = 'Avatar updated successfully';
+          setTimeout(() => this.successMessage = '', 3000);
+        });
+      });
+    }
   }
 
   onSubmit(): void {
+    if (this.form.invalid) return;
     this.loading = true;
-    this.success = '';
+    this.successMessage = '';
     this.error = '';
 
     this.authService.updateProfile(this.form.value).subscribe({
       next: (updatedUser) => {
         this.user = updatedUser;
-        this.success = 'Profile updated successfully!';
         this.loading = false;
-        setTimeout(() => this.success = '', 3000);
+        this.isEditing = false;
+        this.successMessage = 'Profile updated successfully';
+        setTimeout(() => this.successMessage = '', 3000);
       },
       error: (err) => {
-        this.error = err?.error?.message || 'Failed to update profile.';
+        this.error = err?.error?.message || 'Failed to update profile';
         this.loading = false;
       }
     });
-  }
-
-  getInitials(name: string): string {
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  }
-
-  getProviderLabel(provider?: string): string {
-    const map: Record<string, string> = { local: 'Email/Password', google: 'Google', microsoft: 'Microsoft' };
-    return map[provider || 'local'] || provider || '';
   }
 }

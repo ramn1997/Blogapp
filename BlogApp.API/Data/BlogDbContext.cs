@@ -12,6 +12,7 @@ namespace BlogApp.API.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<BlogLike> BlogLikes { get; set; }
         public DbSet<SavedBlog> SavedBlogs { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,6 +77,19 @@ namespace BlogApp.API.Data
             modelBuilder.Entity<SavedBlog>()
                 .HasIndex(sb => new { sb.UserId, sb.BlogId })
                 .IsUnique();
+
+            // Notification
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.Actor)
+                .WithMany()
+                .HasForeignKey(n => n.ActorId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

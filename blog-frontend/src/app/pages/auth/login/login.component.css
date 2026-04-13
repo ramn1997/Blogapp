@@ -283,13 +283,20 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-@media (max-width: 540px) {
-    .auth-card {
-        padding: 40px 24px;
-        box-shadow: none;
-        background: transparent;
-    }
+@media (max-width: 640px) {
     .auth-page-wrapper {
-        background-color: #fff;
+        padding: 20px;
+        background: #fff;
+    }
+    .auth-card {
+        padding: 30px 20px;
+        box-shadow: none;
+        border: none;
+    }
+    .card-title {
+        font-size: 1.8rem;
+    }
+    .brand-name {
+        font-size: 2.2rem;
     }
 }

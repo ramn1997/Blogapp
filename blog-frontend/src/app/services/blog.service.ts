@@ -9,12 +9,13 @@ export class BlogService {
 
     constructor(private http: HttpClient) { }
 
-    getBlogs(page = 1, pageSize = 9, category?: string, search?: string) {
+    getBlogs(page = 1, pageSize = 9, category?: string, search?: string, userId?: number) {
         let params = new HttpParams()
             .set('page', page)
             .set('pageSize', pageSize);
         if (category) params = params.set('category', category);
         if (search) params = params.set('search', search);
+        if (userId) params = params.set('userId', userId);
         return this.http.get<BlogListResponse>(this.API, { params });
     }
 

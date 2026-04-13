@@ -65,8 +65,21 @@ export class LoginComponent implements OnInit {
       providerId: payload.sub
     }).subscribe({
       next: () => this.router.navigate(['/']),
-      error: (err) => {
+      error: (err: any) => {
         this.error = err?.error?.message || 'Google sign-in failed.';
+        this.loading = false;
+      }
+    });
+  }
+
+  onMicrosoftLogin(): void {
+    this.loading = true;
+    this.error = '';
+    this.authService.microsoftLogin().subscribe({
+      next: () => this.router.navigate(['/']),
+      error: (err: any) => {
+        console.error('Microsoft login error:', err);
+        this.error = err?.message || err?.error?.message || 'Microsoft sign-in failed.';
         this.loading = false;
       }
     });
@@ -79,7 +92,7 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.form.value).subscribe({
       next: () => this.router.navigate(['/']),
-      error: (err) => {
+      error: (err: any) => {
         this.error = err?.error?.message || 'Invalid email or password.';
         this.loading = false;
       }

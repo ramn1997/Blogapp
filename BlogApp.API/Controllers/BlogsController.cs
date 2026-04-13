@@ -23,10 +23,11 @@ namespace BlogApp.API.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? category = null,
-            [FromQuery] string? search = null)
+            [FromQuery] string? search = null,
+            [FromQuery] int? userId = null)
         {
-            var userId = TryGetCurrentUserId();
-            var result = await _blogService.GetBlogsAsync(page, pageSize, category, search, userId);
+            var currentUserId = TryGetCurrentUserId();
+            var result = await _blogService.GetBlogsAsync(page, pageSize, category, search, currentUserId, userId);
             return Ok(result);
         }
 

@@ -1,9 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
-
-const CATEGORIES = ['Technology', 'Design', 'Science', 'Health', 'Business', 'Arts', 'Travel', 'Food', 'Politics', 'Other'];
 
 @Component({
   standalone: false,
@@ -14,102 +12,202 @@ const CATEGORIES = ['Technology', 'Design', 'Science', 'Health', 'Business', 'Ar
 export class BlogWriteComponent implements OnInit {
   form!: FormGroup;
   loading = false;
-  error = '';
-  success = '';
-  editId: number | null = null;
-  categories = CATEGORIES;
-  isEditMode = false;
-  uploading = false;
+  isEdit = false;
+  blogId?: number;
+  categories: string[] = [];
+  wordCount = 0;
+  readTime = 0;
 
-  onFileSelected(event: any): void {
+  @ViewChild('contentEditor') contentEditor!: ElementRef;
+  initialContent = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private blogService: BlogService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    this.initForm();
+    this.loadCategories();
+
+    this.route.queryParams.subscribe(params => {
+      if (params['id']) {
+        this.isEdit = true;
+        this.blogId = Number(params['id']);
+        this.loadBlog();
+      }
+    });
+
+    // Listen to form paste on window for the cover image shortcut when no focus
+    window.addEventListener('paste', this.handleGlobalPaste.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('paste', this.handleGlobalPaste.bind(this));
+  }
+
+  initForm(): void {
+    this.form = this.fb.group({
+      title: ['', [Validators.required, Validators.maxLength(100)]],
+      content: ['', Validators.required],
+      summary: [''],
+      coverImageUrl: [''],
+      category: [''],
+      tags: [''],
+      isPublished: [true]
+    });
+  }
+
+  loadCategories(): void {
+    const predefinedCategories = ['Lifestyle', 'Business & Marketing', 'Technology', 'Personal Finance', 'Health & Wellness', 'Travel'];
+    this.blogService.getCategories().subscribe({
+      next: (cats) => {
+        const validCats = cats.filter(c => c && c.trim() !== '');
+        this.categories = Array.from(new Set([...predefinedCategories, ...validCats])).sort();
+      },
+      error: () => this.categories = predefinedCategories.sort()
+    });
+  }
+
+  loadBlog(): void {
+    if (!this.blogId) return;
+    this.blogService.getBlog(this.blogId).subscribe(blog => {
+      this.form.patchValue(blog);
+      this.initialContent = blog.content || '';
+      if (this.contentEditor) {
+        this.contentEditor.nativeElement.innerHTML = this.initialContent;
+      }
+      this.calculateWordCount();
+    });
+  }
+
+  onTitleChange(): void {}
+
+  onContentChange(event: Event): void {
+    const element = event.target as HTMLElement;
+    this.form.patchValue({ content: element.innerHTML });
+    this.calculateWordCount();
+  }
+
+  calculateWordCount(): void {
+    const content = this.form.get('content')?.value || '';
+    // Strip HTML to count words
+    const textContent = content.replace(/<[^>]*>/g, ' ');
+    this.wordCount = textContent.trim() ? textContent.trim().split(/\s+/).length : 0;
+    this.readTime = Math.ceil(this.wordCount / 200);
+  }
+
+  // Cover Image Handlers
+  onCoverSelected(event: any): void {
     const file = event.target.files[0];
+    if (file) this.uploadCover(file);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  onDropCover(event: DragEvent): void {
+    event.preventDefault();
+    const file = event.dataTransfer?.files[0];
+    if (file && file.type.startsWith('image/')) this.uploadCover(file);
+  }
+
+  private uploadCover(file: File): void {
+    this.blogService.uploadImage(file).subscribe(res => {
+      this.form.patchValue({ coverImageUrl: res.url });
+    });
+  }
+
+  // Global Paste for Cover (if title/content not focused)
+  handleGlobalPaste(event: ClipboardEvent): void {
+    const activeEl = document.activeElement;
+    if (activeEl?.tagName === 'INPUT' || activeEl?.tagName === 'TEXTAREA' || activeEl?.getAttribute('contenteditable') === 'true') {
+      return; 
+    }
+    const file = this.getFileFromPaste(event);
+    if (file) this.uploadCover(file);
+  }
+
+  // Content Editor Paste Handler
+  onContentPaste(event: ClipboardEvent): void {
+    const file = this.getFileFromPaste(event);
     if (file) {
-      this.uploading = true;
+      event.preventDefault();
+      // Insert placeholder immediately or use API
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+      
+      const placeholderId = 'img-' + Date.now();
+      const placeholderNode = document.createElement('div');
+      placeholderNode.innerHTML = `<span id="${placeholderId}" style="color:#aaa; font-style:italic;">[Uploading image...]</span>`;
+      range.insertNode(placeholderNode);
+      range.collapse(false);
+
       this.blogService.uploadImage(file).subscribe({
         next: (res) => {
-          const currentContent = this.form.get('content')?.value || '';
-          const imageHtml = `\n<img src="${res.url}" alt="image" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;">\n`;
-          this.form.get('content')?.setValue(currentContent + imageHtml);
-          this.uploading = false;
+          const img = document.createElement('img');
+          img.src = res.url;
+          img.style.maxWidth = '100%';
+          img.style.borderRadius = '8px';
+          img.style.margin = '20px 0';
+          
+          const ph = document.getElementById(placeholderId);
+          if (ph && ph.parentNode) {
+            ph.parentNode.replaceChild(img, ph);
+          } else {
+            this.contentEditor.nativeElement.appendChild(img);
+          }
+          this.form.patchValue({ content: this.contentEditor.nativeElement.innerHTML });
         },
-        error: (err) => {
-          this.error = 'Failed to upload image.';
-          this.uploading = false;
+        error: () => {
+          const ph = document.getElementById(placeholderId);
+          if (ph) ph.innerText = '[Image upload failed]';
         }
       });
     }
   }
 
-  constructor(
-    private fb: FormBuilder,
-    private blogService: BlogService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) { }
-
-  ngOnInit(): void {
-    this.form = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(5)]],
-      content: ['', [Validators.required, Validators.minLength(20)]],
-      summary: [''],
-      coverImageUrl: [''],
-      category: [''],
-      tags: [''],
-      isPublished: [false]
-    });
-
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.editId = Number(id);
-      this.isEditMode = true;
-      this.blogService.getBlog(this.editId).subscribe(blog => {
-        this.form.patchValue({
-          title: blog.title,
-          content: blog.content,
-          summary: blog.summary,
-          coverImageUrl: blog.coverImageUrl,
-          category: blog.category,
-          tags: blog.tags,
-          isPublished: blog.isPublished
-        });
-      });
+  private getFileFromPaste(event: ClipboardEvent): File | null {
+    if (!event.clipboardData) return null;
+    for (let i = 0; i < event.clipboardData.items.length; i++) {
+       const item = event.clipboardData.items[i];
+       if (item.type.indexOf('image') !== -1) {
+           return item.getAsFile();
+       }
     }
-  }
-
-  onSubmit(publish = false): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-    this.loading = true;
-    this.error = '';
-
-    const data = { ...this.form.value, isPublished: publish || this.form.value.isPublished };
-
-    const req = this.editId
-      ? this.blogService.updateBlog(this.editId, data)
-      : this.blogService.createBlog(data);
-
-    req.subscribe({
-      next: (blog) => {
-        this.success = publish ? 'Published!' : 'Saved as draft!';
-        setTimeout(() => this.router.navigate(['/blog', blog.id]), 1000);
-      },
-      error: (err) => {
-        this.error = err?.error?.message || 'Failed to save. Please try again.';
-        this.loading = false;
-      }
-    });
-  }
-
-  get f() { return this.form.controls; }
-
-  wordCount(): number {
-    const content = this.form.value.content || '';
-    return content.split(/\s+/).filter(Boolean).length;
+    return null;
   }
 
   onCancel(): void {
-    if (this.form.dirty) {
-      if (!confirm('Discard changes?')) return;
-    }
     this.router.navigate(['/dashboard']);
+  }
+
+  saveAsDraft(): void {
+    this.form.patchValue({ isPublished: false });
+    this.onSubmit();
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.loading = true;
+    const request = this.isEdit 
+      ? this.blogService.updateBlog(this.blogId!, this.form.value)
+      : this.blogService.createBlog(this.form.value);
+
+    request.subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => this.loading = false
+    });
   }
 }

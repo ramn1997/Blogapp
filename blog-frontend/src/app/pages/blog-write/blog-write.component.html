@@ -1,98 +1,91 @@
-<div class="page-wrapper">
-    <div class="container write-container">
-        <div class="write-header">
-            <h1 class="write-title">{{ isEditMode ? 'Edit post' : 'Write a new post' }}</h1>
+<div class="editorial-write" *ngIf="form">
+    <header class="write-header">
+        <div class="write-actions">
+            <button type="button" class="editorial-btn-ghost" (click)="onCancel()" [disabled]="loading">Cancel</button>
+        </div>
+        <div class="write-actions-right">
+            <button type="button" class="editorial-btn-outline" (click)="saveAsDraft()" [disabled]="loading" *ngIf="!form.get('isPublished')?.value">Save Draft</button>
+            <button type="button" class="editorial-btn-dark" (click)="onSubmit()" [disabled]="loading">
+                {{ loading ? 'Saving...' : (isEdit ? 'Update' : 'Publish') }}
+            </button>
+        </div>
+    </header>
+
+    <form [formGroup]="form">
+        <!-- Minimalist Hero Cover Upload -->
+        <div class="cover-hero" 
+             (click)="coverInput.click()" 
+             [class.has-image]="form.get('coverImageUrl')?.value" 
+             (dragover)="onDragOver($event)" 
+             (drop)="onDropCover($event)">
+            
+            <input type="file" #coverInput style="display: none" (change)="onCoverSelected($event)" accept="image/*">
+            <img *ngIf="form.get('coverImageUrl')?.value" [src]="form.get('coverImageUrl')?.value" class="cover-image-actual">
+            
+            <div class="cover-overlay" *ngIf="form.get('coverImageUrl')?.value">
+                 <span class="material-icons">edit</span> Change Cover
+            </div>
+            
+            <div class="cover-placeholder-hero" *ngIf="!form.get('coverImageUrl')?.value">
+                <span class="material-icons" style="font-size: 2.5rem; margin-bottom: 12px; color: #ccc;">add_photo_alternate</span>
+                <span class="placeholder-main">Add a cover image</span>
+                <span class="placeholder-sub">Click to browse, drag & drop, or paste an image anywhere outside the text</span>
+            </div>
         </div>
 
-        <div class="alert alert-error" *ngIf="error">{{ error }}</div>
-        <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+        <!-- Zen Editor Section -->
+        <div class="zen-editor">
+            <input type="text" 
+                   formControlName="title" 
+                   class="zen-title-input" 
+                   placeholder="Title"
+                   (input)="onTitleChange()">
 
-        <form [formGroup]="form">
-            <!-- Title -->
-            <div class="form-group">
-                <label class="form-label">Title *</label>
-                <input type="text" formControlName="title" class="form-control title-input"
-                    [class.is-invalid]="f['title'].touched && f['title'].invalid"
-                    placeholder="Give your post a great title…">
-                <div class="field-error" *ngIf="f['title'].touched && f['title'].errors?.['required']">Title is required
+            <div class="zen-content-editable" 
+                 contenteditable="true" 
+                 #contentEditor
+                 (input)="onContentChange($event)"
+                 (paste)="onContentPaste($event)"
+                 data-placeholder="Tell your story... You can paste images directly here."></div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <div class="config-header">
+                <h3>Story Settings</h3>
+                <div class="editor-meta-bar">
+                    <span>{{ wordCount }} words</span>
+                    <span class="meta-dot">&middot;</span>
+                    <span>{{ readTime }} min read</span>
                 </div>
-                <div class="field-error" *ngIf="f['title'].touched && f['title'].errors?.['minlength']">At least 5
-                    characters</div>
             </div>
 
-            <!-- Cover image -->
-            <div class="form-group">
-                <label class="form-label">Cover image URL (optional)</label>
-                <input type="url" formControlName="coverImageUrl" class="form-control"
-                    placeholder="https://example.com/image.jpg">
-                <img *ngIf="form.value.coverImageUrl" [src]="form.value.coverImageUrl" alt="Cover preview"
-                    class="cover-preview">
-            </div>
-
-            <!-- Content -->
-            <div class="form-group">
-                <div class="content-header-row">
-                    <label class="form-label">Content *</label>
-                    <div class="content-toolbar">
-                        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
-                        <button type="button" class="btn btn-ghost btn-sm" (click)="fileInput.click()" [disabled]="uploading">
-                            <span class="material-icons" style="font-size: 1.2rem; vertical-align: middle; margin-right: 4px;">image</span>
-                            {{ uploading ? 'Uploading...' : 'Add Image' }}
-                        </button>
-                        <span class="word-count text-muted">{{ wordCount() }} words</span>
-                    </div>
-                </div>
-                <textarea formControlName="content" class="form-control content-area"
-                    [class.is-invalid]="f['content'].touched && f['content'].invalid"
-                    placeholder="Write your story here… HTML is supported"></textarea>
-                <div class="field-error" *ngIf="f['content'].touched && f['content'].errors?.['required']">Content is
-                    required</div>
-                <div class="field-error" *ngIf="f['content'].touched && f['content'].errors?.['minlength']">Too short –
-                    add more content</div>
-            </div>
-
-            <!-- Summary -->
-            <div class="form-group">
-                <label class="form-label">Summary (optional)</label>
-                <textarea formControlName="summary" class="form-control"
-                    placeholder="A short description shown in listings (auto-generated if left blank)"
-                    rows="2"></textarea>
-            </div>
-
-            <!-- Category & Tags row -->
-            <div class="form-row">
-                <div class="form-group flex-1">
-                    <label class="form-label">Category</label>
-                    <select formControlName="category" class="form-control">
-                        <option value="">Select category</option>
+            <div class="config-grid">
+                <div class="field-group">
+                    <label class="field-label">Category</label>
+                    <select formControlName="category" class="editorial-select">
+                        <option value="" disabled selected hidden>Select Category</option>
                         <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
                     </select>
                 </div>
-                <div class="form-group flex-1">
-                    <label class="form-label">Tags</label>
-                    <input type="text" formControlName="tags" class="form-control"
-                        placeholder="angular, webdev, typescript (comma-separated)">
+                <div class="field-group">
+                    <label class="field-label">Tags (Comma separated)</label>
+                    <input type="text" formControlName="tags" class="field-input" placeholder="e.g. design, writing, art">
                 </div>
             </div>
 
-            <!-- Publish toggle -->
-            <div class="publish-row">
-                <label class="toggle-label">
-                    <input type="checkbox" formControlName="isPublished" class="toggle-input">
-                    <span class="toggle-text">Publish immediately</span>
-                </label>
+            <div class="field-group">
+                <label class="field-label">Short Summary</label>
+                <textarea formControlName="summary" class="editorial-textarea" placeholder="A brief description for listings..."></textarea>
             </div>
 
-            <!-- Submit buttons -->
-            <div class="form-submit">
-                <button type="button" class="btn btn-ghost btn-lg" (click)="onCancel()" [disabled]="loading">Cancel</button>
-                <button type="button" class="btn btn-outline btn-lg" (click)="onSubmit(false)" [disabled]="loading">Save
-                    draft</button>
-                <button type="button" class="btn btn-primary btn-lg" (click)="onSubmit(true)" [disabled]="loading">
-                    <span class="material-icons" *ngIf="!loading" style="font-size: 1.2rem; vertical-align: middle; margin-right: 4px;">publish</span>
-                    {{ loading ? 'Publishing…' : 'Publish' }}
-                </button>
+            <div class="field-group publish-group">
+                <label class="publish-toggle">
+                    <input type="checkbox" formControlName="isPublished" class="toggle-input">
+                    <div class="toggle-switch"></div>
+                    <span class="toggle-label-text">{{ form.get('isPublished')?.value ? 'Publish visibly on profile' : 'Keep as draft' }}</span>
+                </label>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>

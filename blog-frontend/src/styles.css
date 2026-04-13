@@ -62,9 +62,22 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 0 40px;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+.main-content {
+  padding-top: 120px;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
 .page-wrapper {
-  padding-top: 100px;
   padding-bottom: 80px;
+  width: 100%;
 }
 
 /* ─── Buttons ───────────────────────────────────────────────────── */
@@ -158,6 +171,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* ─── Utils ─────────────────────────────────────────────────────── */
 .text-uppercase { text-transform: uppercase; letter-spacing: 0.15em; }
+.text-center { text-align: center; }
 .mt-4 { margin-top: 32px; }
 .mb-4 { margin-bottom: 32px; }
 .flex { display: flex; }

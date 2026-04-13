@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Blog } from '../../models';
 import { BlogService } from '../../services/blog.service';
+import { Blog } from '../../models';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: false,
@@ -11,55 +11,64 @@ import { BlogService } from '../../services/blog.service';
 })
 export class DashboardComponent implements OnInit {
   blogs: Blog[] = [];
-  loading = true;
-  totalPages = 1;
+  loading = false;
   currentPage = 1;
-  showDeleteModal = false;
-  blogToDelete: number | null = null;
+  totalPages = 1;
+  blogToDeleteId: number | null = null;
+  
+  stats = {
+    totalPosts: 0,
+    publishedCount: 0,
+    draftCount: 0,
+    totalViews: 0,
+    totalLikes: 0
+  };
 
   constructor(private blogService: BlogService, private router: Router) { }
 
-  ngOnInit(): void { this.loadBlogs(); }
+  ngOnInit(): void {
+    this.loadBlogs();
+    this.loadStats();
+  }
 
   loadBlogs(page = 1): void {
     this.loading = true;
     this.currentPage = page;
-    this.blogService.getMyBlogs(page).subscribe({
+    this.blogService.getMyBlogs(page, 9).subscribe({
       next: (res) => {
         this.blogs = res.items;
         this.totalPages = res.totalPages;
         this.loading = false;
       },
-      error: () => { this.loading = false; }
+      error: () => this.loading = false
     });
   }
 
-  editBlog(id: number): void { this.router.navigate(['/write', id]); }
-
-  confirmDelete(id: number): void {
-    this.blogToDelete = id;
-    this.showDeleteModal = true;
+  loadStats(): void {
+    // In a real app, this would be a single API call
+    this.blogService.getMyBlogs(1, 1).subscribe(res => {
+      this.stats.totalPosts = res.totalCount;
+      // Mocking other stats for demo purposes since API might not have them yet
+      this.stats.publishedCount = res.totalCount; 
+      this.stats.totalViews = res.items.reduce((acc, b) => acc + (b.viewCount || 0), 0);
+      this.stats.totalLikes = res.items.reduce((acc, b) => acc + (b.likeCount || 0), 0);
+    });
   }
 
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.blogToDelete = null;
+  editBlog(id: number): void {
+    this.router.navigate(['/write'], { queryParams: { id } });
+  }
+
+  confirmDelete(id: number): void {
+    this.blogToDeleteId = id;
   }
 
   deleteBlog(): void {
-    if (!this.blogToDelete) return;
-    this.blogService.deleteBlog(this.blogToDelete).subscribe(() => {
-      this.blogs = this.blogs.filter(b => b.id !== this.blogToDelete);
-      this.cancelDelete();
+    if (!this.blogToDeleteId) return;
+    this.blogService.deleteBlog(this.blogToDeleteId).subscribe(() => {
+      this.blogToDeleteId = null;
+      this.loadBlogs(this.currentPage);
+      this.loadStats();
     });
   }
-
-  getPages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  get publishedCount(): number { return this.blogs.filter(b => b.isPublished).length; }
-  get draftCount(): number { return this.blogs.filter(b => !b.isPublished).length; }
-  get totalViews(): number { return this.blogs.reduce((s, b) => s + b.viewCount, 0); }
-  get totalLikes(): number { return this.blogs.reduce((s, b) => s + b.likeCount, 0); }
 }

@@ -17,7 +17,7 @@ const routes: Routes = [
   { path: 'write', component: BlogWriteComponent, canActivate: [AuthGuard] },
   { path: 'write/:id', component: BlogWriteComponent, canActivate: [AuthGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'profile', component: ProfileComponent },
   { path: '**', redirectTo: '' }
 ];
 

@@ -66,8 +66,20 @@ export class RegisterComponent implements OnInit {
       providerId: payload.sub
     }).subscribe({
       next: () => this.router.navigate(['/']),
-      error: (err) => {
+      error: (err: any) => {
         this.error = err?.error?.message || 'Google sign-up failed.';
+        this.loading = false;
+      }
+    });
+  }
+
+  onMicrosoftLogin(): void {
+    this.loading = true;
+    this.error = '';
+    this.authService.microsoftLogin().subscribe({
+      next: () => this.router.navigate(['/']),
+      error: (err: any) => {
+        this.error = err?.error?.message || 'Microsoft sign-up failed.';
         this.loading = false;
       }
     });
@@ -80,7 +92,7 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(this.form.value).subscribe({
       next: () => this.router.navigate(['/']),
-      error: (err) => {
+      error: (err: any) => {
         this.error = err?.error?.message || 'Registration failed. Please try again.';
         this.loading = false;
       }

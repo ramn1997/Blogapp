@@ -19,7 +19,16 @@
             <div class="article-category" *ngIf="blog.category">{{ blog.category | uppercase }}</div>
             <h1 class="article-title">{{ blog.title }}</h1>
             <div class="article-meta">
-                <span class="meta-item">BY {{ blog.author.fullName | uppercase }}</span>
+                <div class="author-display">
+                    <a class="author-avatar-wrap" [routerLink]="['/profile']" [queryParams]="{userId: blog.author.id}">
+                        <div class="avatar-stack">
+                            <span class="material-icons author-fallback-icon">account_circle</span>
+                            <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName" 
+                                class="author-mini-photo" loading="eager">
+                        </div>
+                    </a>
+                    <a class="meta-item author-link" [routerLink]="['/profile']" [queryParams]="{userId: blog.author.id}">BY {{ blog.author.fullName | uppercase }}</a>
+                </div>
                 <span class="meta-sep">/</span>
                 <span class="meta-item">{{ formatDate(blog.publishedAt || blog.createdAt) | uppercase }}</span>
                 <span class="meta-sep">/</span>
@@ -38,7 +47,7 @@
 
             <!-- Tags -->
             <div class="article-tags" *ngIf="getTags().length > 0">
-                <span class="editorial-tag" *ngFor="let tag of getTags()">{{ tag | uppercase }}</span>
+                <a [routerLink]="['/']" [queryParams]="{ q: tag }" class="editorial-tag clickable-tag" *ngFor="let tag of getTags()">{{ tag | uppercase }}</a>
             </div>
 
             <!-- Reactions -->
@@ -89,13 +98,26 @@
                 <!-- Comment List -->
                 <div class="critique-list" *ngIf="comments.length > 0">
                     <div class="critique-item" *ngFor="let comment of comments">
-                        <div class="critique-header">
-                            <span class="critique-author">{{ comment.author.fullName | uppercase }}</span>
-                            <span class="critique-date">{{ formatDate(comment.createdAt) | uppercase }}</span>
-                            <button *ngIf="authService.currentUser?.id === comment.author.id" class="critique-delete"
-                                (click)="deleteComment(comment.id)">REMOVE</button>
+                        <div class="critique-author-column">
+                            <div class="author-avatar-wrap clickable" [routerLink]="['/profile']" [queryParams]="{userId: comment.author.id}">
+                                <div class="avatar-stack">
+                                    <span class="material-icons author-fallback-icon">account_circle</span>
+                                    <img *ngIf="comment.author.avatarUrl" [src]="comment.author.avatarUrl" [alt]="comment.author.fullName" 
+                                        class="author-mini-photo" loading="lazy">
+                                </div>
+                            </div>
                         </div>
-                        <p class="critique-content">{{ comment.content }}</p>
+                        <div class="critique-content-column">
+                            <div class="critique-header">
+                                <span class="critique-author clickable-name" [routerLink]="['/profile']" [queryParams]="{userId: comment.author.id}">
+                                    {{ comment.author.fullName | uppercase }}
+                                </span>
+                                <span class="critique-date">{{ formatDate(comment.createdAt) | uppercase }}</span>
+                                <button *ngIf="authService.currentUser?.id === comment.author.id" class="critique-delete"
+                                    (click)="deleteComment(comment.id)">REMOVE</button>
+                            </div>
+                            <p class="critique-content">{{ comment.content }}</p>
+                        </div>
                     </div>
                 </div>
 

@@ -1,71 +1,152 @@
 <nav class="editorial-nav">
-    <div class="nav-container">
-        <!-- Brand -->
-        <a routerLink="/" class="nav-brand">
-            <span>Scribeflow</span>
-        </a>
+  <div class="nav-container">
+    <!-- Mobile Menu Button (Left on mobile) -->
+    <button class="burger-btn" (click)="toggleMenu()" [class.active]="menuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-        <!-- Search Bar -->
-        <div class="nav-search-wrap">
-            <div class="search-box-mini">
-                <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()"
-                    placeholder="Search archives...">
-                <button (click)="onSearch()">
-                    <span class="material-icons">search</span>
-                </button>
+    <!-- Brand -->
+    <a routerLink="/" class="nav-brand" (click)="closeMenus()">
+      <span>Scribeflow</span>
+    </a>
+
+    <!-- Desktop Search (Hidden on small mobile) -->
+    <div class="nav-search-wrap">
+      <div class="search-box-mini">
+        <input type="text" [ngModel]="searchQuery" (ngModelChange)="onSearchChange($event)" placeholder="Search Story...">
+        <button (click)="onSearch()">
+          <span class="material-icons">search</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Desktop nav links -->
+    <div class="nav-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link">Explore</a>
+    </div>
+
+    <!-- Right actions -->
+    <div class="nav-actions">
+      <ng-container *ngIf="!currentUser; else loggedIn">
+        <a routerLink="/auth/login" class="btn btn-ghost btn-sm hide-mobile">Sign in</a>
+        <a routerLink="/auth/register" class="btn btn-primary btn-sm">Join</a>
+      </ng-container>
+
+      <ng-template #loggedIn>
+        <!-- Notifications -->
+        <div class="notif-wrapper" *ngIf="currentUser">
+          <button class="notif-btn" (click)="toggleNotifMenu($event)" [class.has-unread]="unreadCount > 0">
+            <span class="material-icons">notifications_none</span>
+            <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+          </button>
+          
+          <!-- Notifications Dropdown (Modernized) -->
+          <div class="notifications-dropdown" *ngIf="notifMenuOpen" (click)="$event.stopPropagation()">
+            <div class="dropdown-title">
+                <h4>NOTIFICATIONS</h4>
+                <button class="mark-all-btn" (click)="markAllRead()">Mark all read</button>
             </div>
-        </div>
 
-        <!-- Desktop nav links -->
-        <div class="nav-links">
-            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}"
-                class="nav-link">Explore</a>
-        </div>
+            <div class="notifications-list">
+                <div class="notif-empty" *ngIf="notifications.length === 0">
+                    No new activity
+                </div>
+                
+                <div class="notif-item" *ngFor="let notif of notifications" 
+                     [class.unread]="!notif.isRead"
+                     (click)="markAsRead(notif)">
+                    
+                    <img *ngIf="notif.actorAvatar" [src]="notif.actorAvatar" class="notif-avatar" alt="">
+                    <div *ngIf="!notif.actorAvatar" class="notif-avatar" 
+                         style="background: #eee; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons" style="font-size: 1.2rem; color: #999;">person</span>
+                    </div>
 
-        <!-- Right actions -->
-        <div class="nav-actions">
-            <ng-container *ngIf="!currentUser; else loggedIn">
-                <a routerLink="/auth/login" class="btn btn-ghost btn-sm">Sign in</a>
-                <a routerLink="/auth/register" class="btn btn-primary btn-sm">Join</a>
-            </ng-container>
-
-            <ng-template #loggedIn>
-                <div class="user-menu-wrapper" *ngIf="currentUser">
-                    <button class="avatar-btn" (click)="toggleUserMenu()">
-                        <img *ngIf="currentUser?.avatarUrl" [src]="currentUser!.avatarUrl" [alt]="currentUser!.fullName"
-                            class="avatar">
-                        <span *ngIf="!currentUser?.avatarUrl" class="avatar avatar-fallback">
-                            {{ getInitials(currentUser!.fullName) }}
-                        </span>
-                    </button>
-                    <div class="user-dropdown" *ngIf="userMenuOpen && currentUser">
-                        <div class="dropdown-header">
-                            <div class="dropdown-name">{{ currentUser.fullName }}</div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a routerLink="/dashboard" class="dropdown-item" (click)="closeMenus()">
-                            <span class="material-icons" style="font-size: 1.2rem;">article</span>
-                            My Blogs
-                        </a>
-                        <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">
-                            <span class="material-icons" style="font-size: 1.2rem;">person</span>
-                            Profile
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item danger" (click)="logout()">
-                            <span class="material-icons" style="font-size: 1.2rem;">logout</span>
-                            Sign out
-                        </button>
+                    <div class="notif-content">
+                        <p class="notif-message">{{ notif.message }}</p>
+                        <span class="notif-time">{{ notif.createdAt | date:'shortTime' }}</span>
                     </div>
                 </div>
-                <a routerLink="/write" class="nav-btn-black">
-                    <span class="material-icons"
-                        style="font-size: 1.1rem; vertical-align: middle; margin-right: 6px;">edit</span>
-                    Write Post
-                </a>
-            </ng-template>
-
-
+            </div>
+          </div>
         </div>
+
+        <div class="user-menu-wrapper" *ngIf="currentUser">
+          <button class="avatar-btn" (click)="toggleUserMenu($event)">
+            <img *ngIf="currentUser?.avatarUrl" [src]="currentUser!.avatarUrl" [alt]="currentUser!.fullName"
+              class="avatar">
+            <span *ngIf="!currentUser?.avatarUrl" class="avatar avatar-fallback">
+              {{ getInitials(currentUser!.fullName) }}
+            </span>
+          </button>
+          <!-- User Dropdown (Modernized) -->
+          <div class="user-dropdown" *ngIf="userMenuOpen && currentUser" (click)="$event.stopPropagation()">
+            <div class="dropdown-header">
+                <span class="user-info-name">{{ currentUser.fullName }}</span>
+                <span class="user-info-email">{{ currentUser.email }}</span>
+            </div>
+            
+            <div class="dropdown-menu-list">
+                <a routerLink="/dashboard" class="dropdown-item" (click)="closeMenus()">
+                    <span class="material-icons">dashboard</span>
+                    My Blogs
+                </a>
+                <a routerLink="/profile" class="dropdown-item" (click)="closeMenus()">
+                    <span class="material-icons">person_outline</span>
+                    Profile
+                </a>
+                
+                <div class="dropdown-divider"></div>
+                
+                <button (click)="logout()" class="dropdown-item sign-out">
+                    <span class="material-icons">logout</span>
+                    Sign out
+                </button>
+            </div>
+          </div>
+        </div>
+        <a routerLink="/write" class="nav-btn-black hide-mobile">
+          <span class="material-icons" style="font-size: 1.1rem; vertical-align: middle; margin-right: 6px;">edit</span>
+          Write Post
+        </a>
+      </ng-template>
     </div>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" [class.open]="menuOpen" (click)="closeMenus()"></div>
+  <div class="mobile-menu" [class.open]="menuOpen">
+    <div class="mobile-search">
+      <div class="search-box-mini">
+        <input type="text" [ngModel]="searchQuery" (ngModelChange)="onSearchChange($event)" placeholder="Search archives...">
+        <button (click)="onSearch()">
+          <span class="material-icons">search</span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="mobile-link"
+        (click)="closeMenus()">
+        <span class="material-icons">explore</span> Explore
+      </a>
+      <ng-container *ngIf="currentUser">
+        <a routerLink="/write" class="mobile-link" (click)="closeMenus()">
+          <span class="material-icons">edit_note</span> Write Post
+        </a>
+        <a routerLink="/profile" class="mobile-link" (click)="closeMenus()">
+          <span class="material-icons">person_outline</span> Profile
+        </a>
+      </ng-container>
+      <ng-container *ngIf="!currentUser">
+        <a routerLink="/auth/login" class="mobile-link" (click)="closeMenus()">
+          <span class="material-icons">login</span> Sign In
+        </a>
+        <a routerLink="/auth/register" class="mobile-link" (click)="closeMenus()">
+          <span class="material-icons">person_add</span> Join Scribeflow
+        </a>
+      </ng-container>
+    </div>
+  </div>
 </nav>

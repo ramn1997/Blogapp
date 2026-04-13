@@ -1,183 +1,107 @@
-<div class="editorial-profile-page">
-    <div class="container" *ngIf="user">
+<div class="profile-loading" *ngIf="loading && !user">
+    <div class="loading-spinner"></div>
+    <p>Loading profile...</p>
+</div>
 
-        <!-- Identity Section -->
-        <section class="profile-identity-section">
-            <div class="identity-photo-container">
-                <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" [alt]="user.fullName" class="identity-photo">
-                <div *ngIf="!user.avatarUrl" class="identity-photo identity-photo-fallback"
-                    style="background: #eee; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 4rem; color: #ccc;">
-                    {{ getInitials(user.fullName) }}
+<div class="editorial-profile" *ngIf="user">
+    <!-- Header / Identity -->
+    <header class="profile-identity-section">
+        <div class="identity-photo-container" [class.clickable-photo]="isOwnProfile">
+            <img [src]="user.avatarUrl || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'"
+                [alt]="user.fullName" class="identity-photo">
+
+            <div class="photo-upload-overlay" *ngIf="isOwnProfile" (click)="avatarInput.click()">
+                <span class="material-icons">photo_camera</span>
+                <span class="overlay-text">CHANGE</span>
+            </div>
+            <input type="file" #avatarInput style="display: none" (change)="onAvatarChange($event)" accept="image/*">
+        </div>
+
+        <div class="identity-content">
+            <div class="identity-header">
+                <div class="name-block">
+                    <h1 class="user-name">{{ user.fullName }}</h1>
+                    <div class="user-handle">{{ user.email }}</div>
                 </div>
 
-            </div>
-
-            <div class="identity-content">
-                <div class="identity-header-row">
-                    <h1 class="identity-name serif">{{ user.fullName }}</h1>
-                    <button class="btn-black" (click)="isEditing = !isEditing">
-                        {{ isEditing ? 'Cancel Editing' : 'Edit Profile' }}
+                <div class="action-block" *ngIf="isOwnProfile">
+                    <button class="editorial-btn-dark" (click)="isEditing = !isEditing">
+                        {{ isEditing ? 'CANCEL' : 'EDIT PROFILE' }}
                     </button>
                 </div>
-
-                <p class="identity-bio">{{ user.bio }}</p>
-
-                <div class="identity-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">{{ stats.stories }}</span>
-                        <span class="stat-label">Stories</span>
-                    </div>
-                    <div class="stat-item" style="margin-left: 20px;">
-                        <span class="stat-value">{{ stats.following }}</span>
-                        <span class="stat-label">Saved</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Editing Modal / Section (Conditional Overlay) -->
-        <div class="edit-overlay" *ngIf="isEditing"
-            style="margin-bottom: 60px; padding: 40px; background: #fff; border: 1px solid #eee;">
-            <h2 class="serif" style="margin-bottom: 24px;">Refine your Identity</h2>
-            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="editorial-form-grid"
-                style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                <div class="form-group">
-                    <label class="stat-label">Full Name</label>
-                    <input type="text" formControlName="fullName" class="form-control"
-                        style="width: 100%; border: none; border-bottom: 1px solid #ddd; padding: 8px 0;">
-                </div>
-                <div class="form-group">
-                    <label class="stat-label">Avatar URL</label>
-                    <input type="text" formControlName="avatarUrl" class="form-control"
-                        style="width: 100%; border: none; border-bottom: 1px solid #ddd; padding: 8px 0;">
-                </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label class="stat-label">Bio</label>
-                    <textarea formControlName="bio" class="form-control"
-                        style="width: 100%; border: 1px solid #ddd; padding: 12px; margin-top: 8px;"
-                        rows="3"></textarea>
-                </div>
-                <div style="grid-column: span 2;">
-                    <button type="submit" class="btn-black" [disabled]="loading">Save Changes</button>
-                    <div class="alert alert-success mt-2" *ngIf="success">{{ success }}</div>
-                    <div class="alert alert-error mt-2" *ngIf="error">{{ error }}</div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Dashboard Content -->
-        <div class="profile-dashboard-section">
-            <nav class="profile-tabs">
-                <button class="tab-btn" [class.active]="activeTab === 'posts'" (click)="switchTab('posts')">MY
-                    POSTS</button>
-                <button class="tab-btn" [class.active]="activeTab === 'saved'" (click)="switchTab('saved')">SAVED
-                    COLLECTIONS</button>
-                <button class="tab-btn" [class.active]="activeTab === 'drafts'"
-                    (click)="switchTab('drafts')">DRAFTS</button>
-            </nav>
-
-            <div class="profile-entries-grid" *ngIf="activeTab === 'posts'">
-                <!-- Featured Side-by-Side (Latest Post) -->
-                <div class="featured-entry" *ngIf="myBlogs.length > 0">
-                    <img *ngIf="myBlogs[0].coverImageUrl" [src]="myBlogs[0].coverImageUrl" class="entry-image">
-                    <div class="entry-details">
-                        <div class="entry-meta">{{ myBlogs[0].category | uppercase }} • {{ myBlogs[0].createdAt |
-                            date:'MMM dd' | uppercase }}</div>
-                        <h2 class="entry-title serif">
-                            <a [routerLink]="['/blog', myBlogs[0].id]">{{ myBlogs[0].title }}</a>
-                        </h2>
-                        <p class="entry-excerpt">{{ myBlogs[0].summary }}</p>
-                        <div class="entry-likes"
-                            style="margin-top: auto; display: flex; align-items: center; gap: 4px; font-size: 0.8rem; font-weight: 700;">
-                            <span class="material-icons" style="font-size: 1rem; color: #ff4757;">favorite</span>
-                            {{ myBlogs[0].likeCount }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Regular Archives -->
-                <div class="archive-entry-card" *ngFor="let blog of myBlogs.slice(1); let i = index">
-                    <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" class="entry-image">
-                    <div class="entry-body">
-                        <div class="entry-meta">{{ blog.category | uppercase }} • {{ blog.createdAt | date:'MMM dd' |
-                            uppercase }}</div>
-                        <h3 class="entry-title serif">
-                            <a [routerLink]="['/blog', blog.id]">{{ blog.title }}</a>
-                        </h3>
-                    </div>
-                </div>
-
-                <!-- Create New Card -->
-                <div class="create-new-card" routerLink="/write">
-                    <div class="plus-icon">
-                        <span class="material-icons" style="font-size: 2.5rem;">add</span>
-                    </div>
-                    <h3 class="serif">Write a new story</h3>
-                    <p>The world is waiting for your next perspective.</p>
-                </div>
             </div>
 
-            <!-- Saved Collections Tab -->
-            <div class="profile-entries-grid" *ngIf="activeTab === 'saved'">
-                <div class="saved-collection-header" *ngIf="savedBlogs.length > 0" style="grid-column: 1 / -1; margin-bottom: 20px;">
-                    <h3 class="serif" style="font-size: 1.8rem;">Your Curated Library</h3>
-                    <p class="stat-label">{{ savedBlogs.length }} articles collected from across Scribeflow.</p>
-                </div>
-
-                <div *ngFor="let blog of savedBlogs" class="archive-item">
-                    <app-blog-card [blog]="blog" (savedChange)="loadSavedBlogs()"></app-blog-card>
-                </div>
-
-                <!-- Empty State for Saved -->
-                <div class="empty-tab-state" *ngIf="savedBlogs.length === 0"
-                    style="grid-column: 1 / -1; padding: 100px; text-align: center; border: 1px dashed #ddd;">
-                    <span class="material-icons" style="font-size: 3rem; color: #eee; margin-bottom: 16px;">bookmark_border</span>
-                    <p class="stat-label">Your library is currently empty.</p>
-                    <p style="margin-top: 8px;">Explore Scribeflow and bookmark articles you love to see them here.</p>
-                    <a routerLink="/" class="btn-black" style="display: inline-block; margin-top: 24px; text-decoration: none;">Explore Stories</a>
-                </div>
+            <div class="user-bio" [class.empty]="!user.bio">
+                {{ user.bio || 'This author hasn\'t added a bio yet.' }}
             </div>
 
-            <!-- Drafts Tab -->
-            <div class="profile-entries-grid" *ngIf="activeTab === 'drafts'">
-                <div class="saved-collection-header" *ngIf="drafts.length > 0" style="grid-column: 1 / -1; margin-bottom: 20px;">
-                    <h3 class="serif" style="font-size: 1.8rem;">Work in Progress</h3>
-                    <p class="stat-label">These stories are still in the workshop.</p>
+            <div class="user-stats">
+                <div class="stat-item">
+                    <span class="stat-value">{{ stats.stories }}</span>
+                    <span class="stat-label">Stories</span>
                 </div>
 
-                <div *ngFor="let blog of drafts" class="archive-entry-card dashboard-item">
-                    <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" class="entry-image">
-                    <div class="entry-body">
-                        <div class="entry-meta">DRAFT • LAST UPDATED {{ blog.createdAt | date:'MMM dd' | uppercase }}</div>
-                        <h3 class="entry-title serif">
-                            <a [routerLink]="['/write']" [queryParams]="{id: blog.id}">{{ blog.title || 'Untitled Post' }}</a>
-                        </h3>
-                        <a [routerLink]="['/write']" [queryParams]="{id: blog.id}" class="edit-btn">
-                            <span class="material-icons" style="font-size: 1rem;">edit</span> CONTINUE WRITING
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Empty State for Drafts -->
-                <div class="empty-tab-state" *ngIf="drafts.length === 0"
-                    style="grid-column: 1 / -1; padding: 100px; text-align: center; border: 1px dashed #ddd;">
-                    <span class="material-icons" style="font-size: 3rem; color: #eee; margin-bottom: 16px;">history_edu</span>
-                    <p class="stat-label">The workshop is quiet...</p>
-                    <p>You have no unpublished drafts at the moment.</p>
-                    <a routerLink="/write" class="btn-black" style="display: inline-block; margin-top: 24px; text-decoration: none;">Start a New Story</a>
-                </div>
             </div>
         </div>
+    </header>
 
+    <!-- Edit Form Overlay Style -->
+    <div class="edit-profile-form" *ngIf="isEditing">
+        <h2 class="form-title">Edit your profile</h2>
+
+        <div class="alert alert-success" *ngIf="successMessage">{{ successMessage }}</div>
+        <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" formControlName="fullName" class="editorial-input">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" formControlName="email" class="editorial-input" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Biography</label>
+                <textarea formControlName="bio" class="editorial-textarea" rows="4"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="editorial-btn-dark" [disabled]="loading">
+                    {{ loading ? 'SAVING...' : 'SAVE CHANGES' }}
+                </button>
+            </div>
+        </form>
+
+        <div class="account-meta">
+            Account created on {{ user.createdAt | date:'longDate' }}<br>
+            Auth Provider: {{ user.provider || 'Scribeflow Direct' | uppercase }}
+        </div>
     </div>
 
-    <!-- Site Footer -->
-    <footer class="site-footer container"
-        style="margin-top: 80px; padding: 40px 0; border-top: 1px solid #eee; display: flex; justify-content: space-between; font-size: 0.75rem; color: #888;">
+    <!-- Content Sections -->
+    <div class="content-body" *ngIf="!isEditing">
+        <nav class="profile-tabs">
+            <button class="profile-tab" [class.active]="activeTab === 'stories'"
+                (click)="setTab('stories')">STORIES</button>
+            <button class="profile-tab" *ngIf="isOwnProfile" [class.active]="activeTab === 'activity'"
+                (click)="setTab('activity')">ACTIVITY</button>
+            <button class="profile-tab" *ngIf="isOwnProfile" [class.active]="activeTab === 'drafts'"
+                (click)="setTab('drafts')">DRAFTS</button>
+        </nav>
 
-        <div class="footer-right" style="display: flex; gap: 20px;">
+        <div class="profile-grid">
+            <div class="empty-state" *ngIf="blogs.length === 0">
+                <span class="material-icons"
+                    style="font-size: 3rem; opacity: 0.1; display: block; margin-bottom: 16px;">auto_stories</span>
+                Nothing here yet.
+            </div>
 
-            <span class="copyright">© 2026 Scribeflow. All rights reserved.</span>
+            <app-blog-card *ngFor="let blog of blogs" [blog]="blog"
+                [showActions]="isOwnProfile && (activeTab === 'stories' || activeTab === 'drafts')">
+            </app-blog-card>
         </div>
-    </footer>
+    </div>
 </div>

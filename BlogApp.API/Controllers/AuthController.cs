@@ -79,6 +79,21 @@ namespace BlogApp.API.Controllers
             }
         }
 
+        /// <summary>Get any user's public profile</summary>
+        [HttpGet("users/{id}")]
+        public async Task<IActionResult> GetUserProfile(int id)
+        {
+            try
+            {
+                var profile = await _authService.GetProfileAsync(id);
+                return Ok(profile);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         /// <summary>Update user profile</summary>
         [Authorize]
         [HttpPut("profile")]

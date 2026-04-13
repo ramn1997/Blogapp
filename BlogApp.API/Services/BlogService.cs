@@ -7,7 +7,7 @@ namespace BlogApp.API.Services
 {
     public interface IBlogService
     {
-        Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId);
+        Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId, int? authorId = null);
         Task<BlogResponseDto> GetBlogByIdAsync(int id, int? currentUserId);
         Task<BlogResponseDto> CreateBlogAsync(int userId, CreateBlogDto dto);
         Task<BlogResponseDto> UpdateBlogAsync(int blogId, int userId, UpdateBlogDto dto);
@@ -31,7 +31,26 @@ namespace BlogApp.API.Services
             _context = context;
         }
 
-        public async Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId)
+        private async Task AddNotification(int targetUserId, int actorId, int blogId, string type, string message)
+        {
+            if (targetUserId == actorId) return;
+
+            var notification = new Notification
+            {
+                UserId = targetUserId,
+                ActorId = actorId,
+                RelatedBlogId = blogId,
+                Type = type,
+                Message = message,
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(notification);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId, int? authorId = null)
         {
             var query = _context.Blogs
                 .Include(b => b.Author)
@@ -40,6 +59,9 @@ namespace BlogApp.API.Services
                 .Include(b => b.Comments)
                 .Where(b => b.IsPublished)
                 .AsQueryable();
+
+            if (authorId.HasValue)
+                query = query.Where(b => b.UserId == authorId.Value);
 
             if (!string.IsNullOrWhiteSpace(category))
                 query = query.Where(b => b.Category == category);
@@ -77,6 +99,13 @@ namespace BlogApp.API.Services
             // Increment view count
             blog.ViewCount++;
             await _context.SaveChangesAsync();
+
+            // Notification for View
+            if (currentUserId.HasValue && currentUserId.Value != blog.UserId)
+            {
+                var actor = await _context.Users.FindAsync(currentUserId.Value);
+                await AddNotification(blog.UserId, currentUserId.Value, blog.Id, "View", $"{actor?.FullName} viewed your story: {blog.Title}");
+            }
 
             return MapToBlogResponse(blog, currentUserId);
         }
@@ -183,6 +212,7 @@ namespace BlogApp.API.Services
 
         public async Task<bool> ToggleLikeAsync(int blogId, int userId)
         {
+            var blog = await _context.Blogs.FindAsync(blogId);
             var existing = await _context.BlogLikes
                 .FirstOrDefaultAsync(bl => bl.BlogId == blogId && bl.UserId == userId);
 
@@ -195,11 +225,19 @@ namespace BlogApp.API.Services
 
             _context.BlogLikes.Add(new BlogLike { BlogId = blogId, UserId = userId });
             await _context.SaveChangesAsync();
+
+            if (blog != null)
+            {
+                var actor = await _context.Users.FindAsync(userId);
+                await AddNotification(blog.UserId, userId, blogId, "Like", $"{actor?.FullName} liked your story: {blog.Title}");
+            }
+
             return true;
         }
 
         public async Task<CommentResponseDto> AddCommentAsync(int blogId, int userId, CreateCommentDto dto)
         {
+            var blog = await _context.Blogs.FindAsync(blogId);
             var comment = new Comment
             {
                 Content = dto.Content,
@@ -211,6 +249,12 @@ namespace BlogApp.API.Services
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
             await _context.Entry(comment).Reference(c => c.Author).LoadAsync();
+
+            if (blog != null)
+            {
+                var actor = await _context.Users.FindAsync(userId);
+                await AddNotification(blog.UserId, userId, blogId, "Comment", $"{actor?.FullName} commented on your story: {blog.Title}");
+            }
 
             return MapToComment(comment);
         }
@@ -247,6 +291,7 @@ namespace BlogApp.API.Services
 
         public async Task<bool> ToggleSaveAsync(int blogId, int userId)
         {
+            var blog = await _context.Blogs.FindAsync(blogId);
             var existing = await _context.SavedBlogs
                 .FirstOrDefaultAsync(sb => sb.BlogId == blogId && sb.UserId == userId);
 
@@ -259,6 +304,13 @@ namespace BlogApp.API.Services
 
             _context.SavedBlogs.Add(new SavedBlog { BlogId = blogId, UserId = userId });
             await _context.SaveChangesAsync();
+
+            if (blog != null)
+            {
+                var actor = await _context.Users.FindAsync(userId);
+                await AddNotification(blog.UserId, userId, blogId, "Save", $"{actor?.FullName} saved your story to their library: {blog.Title}");
+            }
+
             return true;
         }
 
