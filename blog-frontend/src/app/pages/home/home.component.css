@@ -24,7 +24,7 @@
     font-size: 0.8rem;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -45,7 +45,7 @@
 .editorial-input {
     width: 100%;
     border: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
     background: transparent;
     padding: 12px 0;
     font-family: 'Inter', sans-serif;
@@ -57,7 +57,7 @@
 }
 
 .editorial-input:focus {
-    border-bottom-color: #111;
+    border-bottom-color: var(--text-primary);
 }
 
 .category-tabs {
@@ -73,7 +73,7 @@
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: #888;
+    color: var(--text-muted);
     cursor: pointer;
     padding-bottom: 6px;
     border-bottom: 2px solid transparent;
@@ -81,8 +81,8 @@
 }
 
 .nav-tab:hover, .nav-tab.active {
-    color: #111;
-    border-bottom-color: #111;
+    color: var(--text-primary);
+    border-bottom-color: var(--text-primary);
 }
 
 /* Grid */
@@ -107,8 +107,8 @@
 .editorial-spinner {
     width: 40px;
     height: 40px;
-    border: 1px solid #ddd;
-    border-top-color: #111;
+    border: 1px solid var(--border);
+    border-top-color: var(--text-primary);
     border-radius: 50%;
     margin: 0 auto;
     animation: spin 1s linear infinite;
@@ -135,13 +135,13 @@
     border: none;
     font-family: 'Playfair Display', serif;
     font-size: 1.2rem;
-    color: #888;
+    color: var(--text-muted);
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .page-link.active {
-    color: #111;
+    color: var(--text-primary);
     font-weight: 700;
     text-decoration: underline;
 }
@@ -153,11 +153,11 @@
     font-weight: 700;
     letter-spacing: 0.15em;
     cursor: pointer;
-    color: #111;
+    color: var(--text-primary);
 }
 
 .nav-btn:disabled {
-    color: #ccc;
+    color: var(--text-muted);
     cursor: not-allowed;
 }
 
@@ -192,14 +192,14 @@
 .search-box {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
     padding-bottom: 4px;
     width: 250px;
     transition: border-bottom-color 0.3s;
 }
 
 .search-box:focus-within {
-    border-bottom-color: #111;
+    border-bottom-color: var(--text-primary);
 }
 
 .search-box input {
@@ -208,14 +208,14 @@
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.05em;
-    color: #111;
+    color: var(--text-primary);
     width: 100%;
     outline: none;
     font-family: 'Inter', sans-serif;
 }
 
 .search-box input::placeholder {
-    color: #ccc;
+    color: var(--text-muted);
     font-style: italic;
 }
 

@@ -21,7 +21,7 @@
 .cover-hero {
     width: 100%;
     min-height: 200px;
-    background: #f8f8f8;
+    background: var(--bg-card);
     border-radius: 8px;
     margin-bottom: 40px;
     display: flex;
@@ -36,11 +36,11 @@
 }
 
 .cover-hero:hover {
-    background: #f0f0f0;
+    background: var(--dropdown-hover);
 }
 
 .cover-hero:not(.has-image):hover {
-    border-color: #ddd;
+    border-color: var(--text-muted);
 }
 
 .cover-image-actual {
@@ -53,7 +53,7 @@
 
 .cover-placeholder-hero {
     text-align: center;
-    color: #888;
+    color: var(--text-muted);
     padding: 40px;
 }
 
@@ -61,13 +61,13 @@
     display: block;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #555;
+    color: var(--text-secondary);
     margin-bottom: 4px;
 }
 
 .placeholder-sub {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted);
 }
 
 .cover-overlay {
@@ -75,7 +75,7 @@
     top: 16px;
     right: 16px;
     background: rgba(0, 0, 0, 0.6);
-    color: #fff;
+    color: var(--btn-primary-text);
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -110,13 +110,13 @@
     border: none;
     background: transparent;
     outline: none;
-    color: #111;
+    color: var(--text-primary);
     padding: 0;
     line-height: 1.2;
 }
 
 .zen-title-input::placeholder {
-    color: #ddd;
+    color: var(--text-muted);
 }
 
 /* Content Editable */
@@ -126,14 +126,14 @@
     font-family: 'Georgia', serif;
     font-size: 1.25rem;
     line-height: 1.8;
-    color: #222;
+    color: var(--text-primary);
     outline: none;
     padding-bottom: 40px;
 }
 
 .zen-content-editable[data-placeholder]:empty:before {
     content: attr(data-placeholder);
-    color: #ccc;
+    color: var(--text-muted);
     font-style: italic;
     cursor: text;
 }
@@ -166,14 +166,14 @@
 .config-header h3 {
     margin: 0;
     font-size: 1.2rem;
-    color: #111;
+    color: var(--text-primary);
 }
 
 .editor-meta-bar {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #888;
+    color: var(--text-muted);
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -181,7 +181,7 @@
 }
 
 .meta-dot {
-    color: #ccc;
+    color: var(--text-muted);
 }
 
 .config-grid {
@@ -198,9 +198,9 @@
 .publish-group {
     margin-top: 40px;
     padding: 24px;
-    background: #fafafa;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border);
 }
 
 .field-label {
@@ -209,7 +209,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    color: #777;
+    color: var(--text-muted);
     margin-bottom: 12px;
 }
 
@@ -217,7 +217,7 @@
     width: 100%;
     padding: 12px 0;
     border: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
     background: transparent;
     font-size: 1rem;
     outline: none;
@@ -225,15 +225,16 @@
 }
 
 .field-input:focus {
-    border-bottom-color: #111;
+    border-bottom-color: var(--text-primary);
 }
 
 .editorial-textarea {
     width: 100%;
     padding: 16px;
-    border: 1px solid #eee;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: #fafafa;
+    background: var(--bg-card);
+    color: var(--text-primary);
     font-size: 1rem;
     outline: none;
     min-height: 100px;
@@ -242,16 +243,16 @@
 }
 
 .editorial-textarea:focus {
-    border-color: #ccc;
-    background: #fff;
+    border-color: var(--text-muted);
+    background: var(--bg-card);
 }
 
 .editorial-select {
     width: 100%;
-    padding: 12px 0;
-    border: none;
-    border-bottom: 1.5px solid #eee;
-    background: transparent;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg-card);
     font-size: 1rem;
     outline: none;
     cursor: pointer;
@@ -259,15 +260,19 @@
     -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right center;
+    background-position: right 16px center;
     background-size: 1.2rem;
-    color: #111;
+    color: var(--text-primary);
     transition: all 0.3s ease;
 }
 
+.editorial-select option {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
 .editorial-select:focus {
-    border-bottom-color: #111;
-    background-position: right 4px center;
+    border-color: var(--text-muted);
 }
 
 /* Toggle */
@@ -282,7 +287,7 @@
 .toggle-switch {
     width: 44px;
     height: 24px;
-    background: #ddd;
+    background: var(--border);
     border-radius: 20px;
     position: relative;
     transition: background 0.3s;
@@ -295,14 +300,14 @@
     left: 3px;
     width: 18px;
     height: 18px;
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 50%;
     transition: left 0.3s, transform 0.3s;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .toggle-input:checked + .toggle-switch {
-    background: #111;
+    background: var(--primary);
 }
 
 .toggle-input:checked + .toggle-switch::after {
@@ -314,14 +319,14 @@
 .toggle-label-text {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-secondary);
 }
 
 /* Buttons */
 .editorial-btn-dark {
     padding: 10px 24px;
-    background: #111;
-    color: #fff;
+    background: var(--primary);
+    color: var(--btn-primary-text);
     border: none;
     font-size: 0.8rem;
     font-weight: 700;
@@ -344,8 +349,8 @@
 .editorial-btn-outline {
     padding: 10px 24px;
     background: transparent;
-    color: #111;
-    border: 1px solid #ddd;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -355,14 +360,14 @@
 }
 
 .editorial-btn-outline:hover:not(:disabled) {
-    border-color: #111;
-    background: #fafafa;
+    border-color: var(--text-primary);
+    background: var(--dropdown-hover);
 }
 
 .editorial-btn-ghost {
     padding: 10px 16px;
     background: transparent;
-    color: #666;
+    color: var(--text-secondary);
     border: none;
     font-size: 0.8rem;
     font-weight: 600;
@@ -372,5 +377,5 @@
 }
 
 .editorial-btn-ghost:hover {
-    color: #111;
+    color: var(--text-primary);
 }

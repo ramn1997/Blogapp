@@ -28,10 +28,6 @@
             <span class="stat-value">{{ stats.totalViews }}</span>
             <span class="stat-label">Total Views</span>
         </div>
-        <div class="stat-card">
-            <span class="stat-value">{{ stats.totalLikes }}</span>
-            <span class="stat-label">Total Likes</span>
-        </div>
     </div>
 
     <section class="posts-section">
@@ -82,9 +78,9 @@
             <div class="modal-title">Delete this story?</div>
             <p class="modal-text">This action is permanent and cannot be undone. All engagement data will be lost.</p>
             
-            <div class="modal-actions">
-                <button class="editorial-btn-dark" style="background: #eee; color: #444;" (click)="blogToDeleteId = null">CANCEL</button>
-                <button class="editorial-btn-dark" style="background: #ff4757;" (click)="deleteBlog()">DELETE STORY</button>
+            <div class="modal-actions" style="display: flex; gap: 12px; justify-content: center;">
+                <button class="btn btn-outline" style="flex: 1;" (click)="blogToDeleteId = null">Cancel</button>
+                <button class="btn btn-danger" style="flex: 1;" (click)="deleteBlog()">Delete Story</button>
             </div>
         </div>
     </div>

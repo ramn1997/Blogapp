@@ -85,14 +85,15 @@ namespace BlogApp.API.Services
             if (user == null)
             {
                 // Check if email exists with different provider
-                user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email.ToLower());
+                var safeEmail = (dto.Email ?? "").ToLower();
+                user = await _context.Users.FirstOrDefaultAsync(u => u.Email == safeEmail);
                 if (user == null)
                 {
                     // Create new user
                     user = new User
                     {
                         FullName = dto.FullName,
-                        Email = dto.Email.ToLower(),
+                        Email = (dto.Email ?? "").ToLower(),
                         Provider = dto.Provider.ToLower(),
                         ProviderId = dto.ProviderId,
                         AvatarUrl = dto.AvatarUrl,

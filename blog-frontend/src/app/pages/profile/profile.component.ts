@@ -22,6 +22,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   successMessage = '';
   error = '';
   activeTab = 'stories';
+  blogToDeleteId: number | null = null;
   
   blogs: Blog[] = [];
   stats = { stories: 0, following: 0 };
@@ -170,6 +171,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.error = err?.error?.message || 'Failed to update profile';
         this.loading = false;
       }
+    });
+  }
+
+  editBlog(id: number): void {
+    this.router.navigate(['/write'], { queryParams: { id } });
+  }
+
+  confirmDelete(id: number): void {
+    this.blogToDeleteId = id;
+  }
+
+  deleteBlog(): void {
+    if (!this.blogToDeleteId) return;
+    this.blogService.deleteBlog(this.blogToDeleteId).subscribe(() => {
+      this.blogToDeleteId = null;
+      this.loadUserBlogs();
     });
   }
 }

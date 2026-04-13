@@ -62,7 +62,11 @@ namespace BlogApp.API.Controllers
                 }
 
                 var request = HttpContext.Request;
-                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+                var scheme = request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? request.Scheme;
+                if (request.Host.Value.Contains("azurewebsites.net")) {
+                    scheme = "https";
+                }
+                var baseUrl = $"{scheme}://{request.Host}{request.PathBase}";
                 var finalUrl = $"{baseUrl}/uploads/{fileName}";
                 
                 _logger.LogInformation("Upload successful. URL: {Url}", finalUrl);

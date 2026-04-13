@@ -27,7 +27,7 @@ export function MSALInstanceFactory(): IPublicClientApplication {
       redirectUri: window.location.origin
     },
     cache: {
-      cacheLocation: BrowserCacheLocation.LocalStorage
+      cacheLocation: BrowserCacheLocation.SessionStorage
     }
   });
 }

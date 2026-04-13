@@ -29,6 +29,11 @@
 
     <!-- Right actions -->
     <div class="nav-actions">
+      <!-- Theme Toggle -->
+      <button class="theme-toggle-btn hide-mobile" (click)="toggleTheme()" aria-label="Toggle dark mode" style="background: transparent; border: none; cursor: pointer; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 50%; margin-right: 8px;">
+        <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span>
+      </button>
+
       <ng-container *ngIf="!currentUser; else loggedIn">
         <a routerLink="/auth/login" class="btn btn-ghost btn-sm hide-mobile">Sign in</a>
         <a routerLink="/auth/register" class="btn btn-primary btn-sm">Join</a>
@@ -138,6 +143,9 @@
         <a routerLink="/profile" class="mobile-link" (click)="closeMenus()">
           <span class="material-icons">person_outline</span> Profile
         </a>
+        <a class="mobile-link" (click)="toggleTheme(); closeMenus()" style="cursor: pointer;">
+          <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span> {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
+        </a>
       </ng-container>
       <ng-container *ngIf="!currentUser">
         <a routerLink="/auth/login" class="mobile-link" (click)="closeMenus()">
@@ -145,6 +153,9 @@
         </a>
         <a routerLink="/auth/register" class="mobile-link" (click)="closeMenus()">
           <span class="material-icons">person_add</span> Join Scribeflow
+        </a>
+        <a class="mobile-link" (click)="toggleTheme(); closeMenus()" style="cursor: pointer;">
+          <span class="material-icons">{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</span> {{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}
         </a>
       </ng-container>
     </div>

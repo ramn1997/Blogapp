@@ -22,6 +22,8 @@ export class NavbarComponent implements OnInit {
   
   notifications: AppNotification[] = [];
   unreadCount = 0;
+  
+  isDarkMode = false;
 
   constructor(
     private authService: AuthService, 
@@ -46,6 +48,12 @@ export class NavbarComponent implements OnInit {
         this.notificationService.refreshUnreadCount();
       }
     });
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      this.isDarkMode = true;
+      document.body.classList.add('dark-theme');
+    }
 
     this.notificationService.unreadCount$.subscribe(count => {
       this.unreadCount = count;
@@ -79,6 +87,17 @@ export class NavbarComponent implements OnInit {
 
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
+  toggleTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
+    if (this.isDarkMode) {
+      document.body.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
+    }
   }
 
   toggleMenu(): void { this.menuOpen = !this.menuOpen; }

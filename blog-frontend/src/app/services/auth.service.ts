@@ -32,14 +32,12 @@ export class AuthService {
         if (this.msalInitialized) return;
         try {
             await this.msalService.instance.initialize();
-            await this.msalService.instance.handleRedirectPromise();
             this.msalInitialized = true;
+            await this.msalService.instance.handleRedirectPromise();
             console.log('MSAL initialized successfully');
         } catch (e) {
-            console.error('MSAL init error:', e);
-            if (e instanceof Error && e.message.includes('already been initialized')) {
-                this.msalInitialized = true;
-            }
+            console.warn('MSAL cache check note:', e);
+            this.msalInitialized = true;
         }
     }
 
@@ -89,19 +87,22 @@ export class AuthService {
     }
 
     microsoftLogin(): Observable<AuthResponse> {
-        // Wait for MSAL to be fully ready, then use instance.loginPopup directly
-        return from(this.ensureMsalReady()).pipe(
-            switchMap(() => from(this.msalService.instance.loginPopup({
-                scopes: ['user.read', 'openid', 'profile', 'email'],
-                prompt: 'select_account'
-            }))),
+        // Fire popup directly to avoid browser popup blocker from async delays
+        return from(this.msalService.instance.loginPopup({
+            scopes: ['user.read', 'openid', 'profile', 'email'],
+            prompt: 'select_account'
+        })).pipe(
             switchMap(res => {
+                const account = res.account;
+                if (!account) {
+                    throw new Error('Microsoft authentication failed: No account info returned.');
+                }
                 const oauthReq: OAuthLoginRequest = {
                     provider: 'microsoft',
-                    idToken: res.idToken,
-                    email: res.account.username,
-                    fullName: res.account.name || 'Microsoft User',
-                    providerId: res.account.localAccountId,
+                    idToken: res.idToken || '',
+                    email: account.username || account.name || 'microsoft-user@scribeflow.com',
+                    fullName: account.name || 'Microsoft User',
+                    providerId: account.localAccountId || res.uniqueId || 'unknown',
                     avatarUrl: ''
                 };
                 return this.oauthLogin(oauthReq);

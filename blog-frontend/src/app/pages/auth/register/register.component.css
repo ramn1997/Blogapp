@@ -27,20 +27,20 @@
     font-weight: 700;
     font-style: italic;
     margin-bottom: 8px;
-    color: #111;
+    color: var(--text-primary);
 }
 
 .brand-subtitle {
     font-size: 0.7rem;
     letter-spacing: 0.2em;
     font-weight: 500;
-    color: #666;
+    color: var(--text-secondary);
     text-transform: uppercase;
 }
 
 /* Auth Card */
 .auth-card {
-    background: #ffffff;
+    background: var(--bg-card)fff;
     width: 100%;
     max-width: 500px;
     padding: 60px 48px;
@@ -53,12 +53,12 @@
     font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 12px;
-    color: #111;
+    color: var(--text-primary);
 }
 
 .card-subtitle {
     font-size: 0.95rem;
-    color: #666;
+    color: var(--text-secondary);
     margin-bottom: 40px;
 }
 
@@ -79,7 +79,7 @@
     font-size: 0.65rem;
     font-weight: 600;
     letter-spacing: 0.1em;
-    color: #111;
+    color: var(--text-primary);
     text-transform: uppercase;
 }
 
@@ -89,7 +89,7 @@
     border-bottom: 1px solid #e0e0e0;
     padding: 10px 0;
     font-size: 1rem;
-    color: #111;
+    color: var(--text-primary);
     background: transparent;
     outline: none;
     transition: border-bottom-color 0.3s;
@@ -98,18 +98,18 @@
 }
 
 .form-input::placeholder {
-    color: #ccc;
+    color: var(--text-muted);
 }
 
 .form-input:focus {
-    border-bottom-color: #111;
+    border-bottom-color: var(--text-primary);
 }
 
 /* Button */
 .btn-signin {
     width: 100%;
-    background: #111;
-    color: #fff;
+    background: var(--primary);
+    color: var(--btn-primary-text);
     border: none;
     padding: 18px;
     font-size: 0.85rem;
@@ -126,7 +126,7 @@
 }
 
 .btn-signin:hover {
-    background: #222;
+    background: var(--primary);
 }
 
 .btn-signin:disabled {
@@ -140,14 +140,14 @@
     align-items: center;
     text-align: center;
     margin: 40px 0;
-    color: #999;
+    color: var(--text-muted);
 }
 
 .social-divider::before,
 .social-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
 .social-divider span {
@@ -171,12 +171,12 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: #ffffff;
+    background: var(--bg-card)fff;
     border: 1px solid #f0f0f0;
     padding: 14px;
     font-size: 0.7rem;
     font-weight: 700;
-    color: #111;
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     cursor: pointer;
@@ -199,11 +199,11 @@
 .card-footer {
     text-align: center;
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .card-footer a {
-    color: #111;
+    color: var(--text-primary);
     font-weight: 700;
     text-decoration: none;
 }
@@ -216,13 +216,13 @@
 .page-footer {
     margin-top: 60px;
     font-size: 0.65rem;
-    color: #999;
+    color: var(--text-muted);
     letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
 .alert-error {
-    background: #fff5f5;
+    background: var(--bg-card)5f5;
     color: #c53030;
     padding: 12px;
     border-left: 4px solid #c53030;
@@ -243,7 +243,7 @@
     width: 16px;
     height: 16px;
     border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
+    border-top-color: var(--btn-primary-text);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -253,7 +253,7 @@
 @media (max-width: 640px) {
     .auth-page-wrapper {
         padding: 20px;
-        background: #fff;
+        background: var(--bg-card);
     }
     .auth-card {
         padding: 30px 20px;
