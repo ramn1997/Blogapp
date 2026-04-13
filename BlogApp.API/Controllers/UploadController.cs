@@ -43,7 +43,8 @@ namespace BlogApp.API.Controllers
                 return BadRequest($"Invalid file type: {extension}");
             }
 
-            var webRoot = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+            var webRoot = isAzure ? "/home/site/wwwroot" : (_environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
             var uploadsFolder = Path.Combine(webRoot, "uploads");
             
             _logger.LogInformation("Saving to folder: {Folder}", uploadsFolder);

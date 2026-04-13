@@ -102,11 +102,21 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
 
-// Ensure uploads directory exists
-var uploadsPath = Path.Combine(app.Environment.WebRootPath ?? "wwwroot", "uploads");
+// Setup persistent uploads directory for Azure Containers
+var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+var uploadBaseUrl = isAzure ? "/home/site/wwwroot" : (app.Environment.WebRootPath ?? "wwwroot");
+var uploadsPath = Path.Combine(uploadBaseUrl, "uploads");
+
 if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
 
-app.UseStaticFiles();
+app.UseStaticFiles(); // Default wwwroot
+
+// Map the persistent uploads folder to the /uploads URL
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
