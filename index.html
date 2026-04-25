@@ -1,8 +1,16 @@
 <!doctype html>
 <html lang="en" data-beasties-container>
 
-<head><base href="/Blogapp/">
+<head>
+  <!-- MSAL Popup Handler -->
+  <script>
+    if (window.opener && window.opener !== window && (window.location.hash || window.location.search)) {
+      document.documentElement.style.display = 'none';
+      setTimeout(() => { if (window.opener && !window.opener.closed) window.close(); }, 5000);
+    }
+  </script>
   <meta charset="utf-8">
+  <base href="/Blogapp/">
   <title>Scribeflow – A Modern Blog Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="ThoughtStream – Write, publish, and discover insightful blog posts on any topic.">
@@ -19,6 +27,6 @@
 
 <body>
   <app-root></app-root>
-<link rel="modulepreload" href="chunk-42NE2CY3.js"><script src="polyfills-B6TNHZQ6.js" type="module"></script><script src="main-TUNO7FIG.js" type="module"></script></body>
+<script src="polyfills-B6TNHZQ6.js" type="module"></script><script src="main-N44423Q4.js" type="module"></script></body>
 
 </html>
