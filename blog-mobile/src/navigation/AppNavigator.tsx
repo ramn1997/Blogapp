@@ -95,6 +95,14 @@ const MainTabs = () => {
           headerTitle: 'My Dashboard'
         }}
       />
+      <Tab.Screen 
+        name="Notifications" 
+        component={NotificationScreen} 
+        options={{
+          tabBarIcon: ({ color }) => <Bell size={20} color={color} />,
+          tabBarLabel: 'Notifications'
+        }}
+      />
 
       <Tab.Screen 
         name="Profile" 
