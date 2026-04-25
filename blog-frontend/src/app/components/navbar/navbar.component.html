@@ -22,9 +22,7 @@
       </div>
     </div>
 
-    <!-- Desktop nav links -->
     <div class="nav-links hide-mobile">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="nav-link">Explore</a>
     </div>
 
     <!-- Right actions -->
@@ -132,10 +130,7 @@
       </div>
     </div>
     <div class="mobile-links">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}" class="mobile-link"
-        (click)="closeMenus()">
-        <span class="material-icons">explore</span> Explore
-      </a>
+
       <ng-container *ngIf="currentUser">
         <a routerLink="/write" class="mobile-link" (click)="closeMenus()">
           <span class="material-icons">edit_note</span> Write Post

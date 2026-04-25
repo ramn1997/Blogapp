@@ -1,43 +1,135 @@
-<div class="page-wrapper">
-    <!-- Archive Feed / Search Results -->
-    <main class="archives-container container">
-        <div class="loading-state" *ngIf="loading">
-            <div class="editorial-spinner"></div>
+<div class="home-container container py-5">
+    
+    <!-- Loading State -->
+    <div class="loading-state text-center py-5" *ngIf="loading">
+        <div class="editorial-spinner"></div>
+    </div>
+
+    <div *ngIf="!loading">
+        
+        <!-- Search Results Header -->
+        <div class="search-results-header mb-5" *ngIf="searchQuery">
+            <h1 class="serif">Results for "{{ searchQuery }}"</h1>
         </div>
 
-        <div class="search-results-header" *ngIf="searchQuery && !loading" style="margin-bottom: 30px;">
-            <h1 class="serif" style="font-size: 2.5rem;">Results for "{{ searchQuery }}"</h1>
-        </div>
-
-        <div class="editorial-grid" *ngIf="!loading">
-            <div *ngFor="let blog of blogs; let i = index" [class.featured-item]="i === 0 && !searchQuery">
-                <app-blog-card [blog]="blog" [featured]="i === 0 && !searchQuery"></app-blog-card>
+        <!-- Trending Section -->
+        <section class="section-wrapper" *ngIf="trendingBlogs.length > 0 && !searchQuery">
+            <div class="section-header">
+                <h2 class="serif">Trending Today</h2>
             </div>
-        </div>
+            <div class="horizontal-scroll">
+                <div class="trending-card" *ngFor="let blog of trendingBlogs">
+                    <a [routerLink]="['/blog', blog.id]" class="text-decoration-none color-inherit">
+                        <div class="card-img-wrap">
+                            <img [src]="blog.coverImageUrl" alt="Cover">
+                        </div>
+                        <div class="card-content">
+                            <span class="card-cat">{{ blog.category }}</span>
+                            <h3 class="card-title serif text-text-primary">{{ blog.title }}</h3>
+                            <div class="card-footer">
+                                <div class="author-info">
+                                    <div class="author-avatar-mini">
+                                        {{ blog.author.fullName[0] }}
+                                    </div>
+                                    <span class="author-name-mini">{{ blog.author.fullName }}</span>
+                                </div>
+                                <span class="read-time">{{ blog.readTimeMinutes }} min read</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
 
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="!loading && blogs.length === 0" style="padding: 100px 0; text-align: center;">
-            <span class="material-icons" style="font-size: 4rem; color: #eee; margin-bottom: 20px;">search_off</span>
-            <h3 class="serif">No entries found.</h3>
-            <p class="text-muted">The archives are silent on this topic.</p>
-        </div>
+        <!-- Topic Selection -->
+        <section class="section-wrapper" *ngIf="!searchQuery">
+            <div class="section-header">
+                <h2 class="serif">Topics for you</h2>
+            </div>
+            <div class="category-pills">
+                <div class="category-pill" 
+                     *ngFor="let cat of categories" 
+                     [class.active]="selectedCategory === cat"
+                     (click)="selectCategory(cat)">
+                    {{ cat }}
+                </div>
+            </div>
+        </section>
 
-        <!-- Pagination -->
-        <nav class="archives-pagination" *ngIf="!loading && totalPages > 1" style="margin-top: 60px;">
-            <button (click)="loadBlogs(currentPage - 1)" [disabled]="currentPage === 1">
-                <span class="material-icons">chevron_left</span>
-            </button>
-            <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
-            <button (click)="loadBlogs(currentPage + 1)" [disabled]="currentPage === totalPages">
-                <span class="material-icons">chevron_right</span>
-            </button>
-        </nav>
-    </main>
+        <!-- From Library / Saved (If Logged In) -->
+        <section class="section-wrapper" *ngIf="savedBlogs.length > 0 && !searchQuery">
+            <div class="section-header">
+                <h2 class="serif">From your Library</h2>
+                <a routerLink="/dashboard" class="see-all">Your saved collection</a>
+            </div>
+            <div class="horizontal-scroll">
+                <div class="trending-card" *ngFor="let blog of savedBlogs">
+                    <a [routerLink]="['/blog', blog.id]" class="text-decoration-none color-inherit">
+                        <div class="card-img-wrap">
+                            <img [src]="blog.coverImageUrl" alt="Cover">
+                        </div>
+                        <div class="card-content">
+                            <span class="card-cat">{{ blog.category }}</span>
+                            <h3 class="card-title serif text-text-primary">{{ blog.title }}</h3>
+                            <div class="card-footer">
+                                <span class="read-time">By {{ blog.author.fullName }}</span>
+                                <span class="material-icons text-muted" style="font-size: 1rem;">bookmark</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
 
-    <!-- Site Footer -->
-    <footer class="site-footer container" style="margin-top: 100px; padding: 40px 0; border-top: 1px solid #eee;">
-        <div class="footer-right">
-            <span class="copyright">© 2026 Scribeflow. All rights reserved.</span>
-        </div>
-    </footer>
+        <!-- Authors Section -->
+        <section class="section-wrapper" *ngIf="authors.length > 0 && !searchQuery">
+            <div class="section-header">
+                <h2 class="serif">Writers to follow</h2>
+            </div>
+            <div class="horizontal-scroll">
+                <a [routerLink]="['/profile', author.id]" class="author-circle-card" *ngFor="let author of authors">
+                    <div class="author-avatar-lg">
+                        <img *ngIf="author.avatarUrl" [src]="author.avatarUrl" [alt]="author.fullName">
+                        <span *ngIf="!author.avatarUrl">{{ author.fullName[0] }}</span>
+                    </div>
+                    <span class="author-name-lg">{{ author.fullName }}</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Main Feed (Latest) -->
+        <section class="section-wrapper">
+            <div class="section-header">
+                <h2 class="serif">{{ searchQuery ? 'Found in Archives' : 'Latest Stories' }}</h2>
+            </div>
+            
+            <div class="latest-grid">
+                <app-blog-card *ngFor="let blog of latestBlogs" [blog]="blog"></app-blog-card>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state text-center py-5" *ngIf="latestBlogs.length === 0">
+                <span class="material-icons mb-3" style="font-size: 3rem; color: #eee;">article</span>
+                <p class="text-muted serif">No stories found in this section.</p>
+            </div>
+
+            <!-- Pagination -->
+            <div class="editorial-pagination mt-5" *ngIf="totalPages > 1">
+                <div class="page-numbers">
+                    <button class="page-link" 
+                            *ngFor="let p of getPages()" 
+                            [class.active]="p === currentPage"
+                            (click)="loadLatest(p)">
+                        {{ p }}
+                    </button>
+                </div>
+                <div class="nav-btns">
+                    <button class="nav-btn" (click)="loadLatest(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                    <span class="mx-3 text-muted">/</span>
+                    <button class="nav-btn" (click)="loadLatest(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
 </div>

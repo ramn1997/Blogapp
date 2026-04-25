@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import api, { API_BASE_URL } from '../../services/api';
@@ -26,15 +27,27 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
 
   useEffect(() => {
     isMounted.current = true;
+    fetchCategories();
     return () => { isMounted.current = false; };
   }, []);
 
-  useEffect(() => {
-    fetchCategories();
-    if (editId) {
-      fetchBlogDetails();
-    }
-  }, [editId]);
+  // Use focus effect to handle state when navigating to this screen
+  useFocusEffect(
+    useCallback(() => {
+      if (editId) {
+        fetchBlogDetails();
+      } else {
+        // Reset state for new blog
+        setTitle('');
+        setSummary('');
+        setContent('');
+        setCategory('');
+        setTags('');
+        setImage(null);
+        setExistingImageUrl('');
+      }
+    }, [editId])
+  );
 
   const showFeedback = (type: 'success' | 'error', title: string, message: string) => {
     setModalConfig({ type, title, message });

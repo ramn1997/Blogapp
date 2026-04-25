@@ -94,6 +94,14 @@ namespace BlogApp.API.Controllers
             }
         }
 
+        /// <summary>Get recommended authors</summary>
+        [HttpGet("authors")]
+        public async Task<IActionResult> GetAuthors([FromQuery] int count = 10)
+        {
+            var authors = await _authService.GetAuthorsAsync(count);
+            return Ok(authors);
+        }
+
         /// <summary>Update user profile</summary>
         [Authorize]
         [HttpPut("profile")]

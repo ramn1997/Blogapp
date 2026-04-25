@@ -9,13 +9,14 @@ export class BlogService {
 
     constructor(private http: HttpClient) { }
 
-    getBlogs(page = 1, pageSize = 9, category?: string, search?: string, userId?: number) {
+    getBlogs(page = 1, pageSize = 9, category?: string, search?: string, userId?: number, sortBy?: string) {
         let params = new HttpParams()
             .set('page', page)
             .set('pageSize', pageSize);
         if (category) params = params.set('category', category);
         if (search) params = params.set('search', search);
         if (userId) params = params.set('userId', userId);
+        if (sortBy) params = params.set('sortBy', sortBy);
         return this.http.get<BlogListResponse>(this.API, { params });
     }
 
@@ -67,12 +68,6 @@ export class BlogService {
 
     getSavedBlogs(page = 1, pageSize = 9) {
         return this.http.get<BlogListResponse>(`${this.API}/saved`, {
-            params: new HttpParams().set('page', page).set('pageSize', pageSize)
-        });
-    }
-
-    getInteractedBlogs(page = 1, pageSize = 9) {
-        return this.http.get<BlogListResponse>(`${this.API}/interacted`, {
             params: new HttpParams().set('page', page).set('pageSize', pageSize)
         });
     }

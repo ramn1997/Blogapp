@@ -63,6 +63,12 @@ export class AuthService {
         return this.http.get<User>(`${this.API}/users/${id}`);
     }
 
+    getAuthors(count = 10) {
+        return this.http.get<User[]>(`${this.API}/authors`, {
+            params: { count }
+        });
+    }
+
     updateProfile(data: Partial<User>) {
         return this.http.put<User>(`${this.API}/profile`, data).pipe(
             tap(user => {

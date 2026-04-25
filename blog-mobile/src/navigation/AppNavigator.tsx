@@ -20,6 +20,7 @@ import DashboardScreen from '../screens/main/DashboardScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import NotificationScreen from '../screens/main/NotificationScreen';
 import AuthorProfileScreen from '../screens/main/AuthorProfileScreen';
+import SearchScreen from '../screens/main/SearchScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -63,10 +64,11 @@ const MainTabs = () => {
       }}
     >
       <Tab.Screen 
-        name="Explore" 
+        name="Home" 
         component={HomeScreen} 
         options={({ navigation }) => ({ 
-          tabBarIcon: ({ color }) => <Feather name="compass" size={20} color={color} />,
+          tabBarIcon: ({ color }) => <Feather name="home" size={20} color={color} />,
+          headerShown: false,
           headerRight: () => !isAuthenticated ? (
             <TouchableOpacity 
               onPress={() => navigation.navigate('Login')}
@@ -93,14 +95,7 @@ const MainTabs = () => {
           headerTitle: 'My Dashboard'
         }}
       />
-      <Tab.Screen 
-        name="Notifications" 
-        component={NotificationScreen} 
-        options={{
-          tabBarIcon: ({ color }) => <Bell size={20} color={color} />,
-          tabBarLabel: 'Notifications'
-        }}
-      />
+
       <Tab.Screen 
         name="Profile" 
         component={ProfileScreen} 
@@ -152,6 +147,11 @@ const AppNavigator = () => {
         <Stack.Screen 
           name="AuthorProfile" 
           component={AuthorProfileScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Search" 
+          component={SearchScreen} 
           options={{ headerShown: false }} 
         />
       </Stack.Navigator>

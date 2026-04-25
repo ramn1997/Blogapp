@@ -24,10 +24,11 @@ namespace BlogApp.API.Controllers
             [FromQuery] int pageSize = 10,
             [FromQuery] string? category = null,
             [FromQuery] string? search = null,
-            [FromQuery] int? userId = null)
+            [FromQuery] int? userId = null,
+            [FromQuery] string? sortBy = null)
         {
             var currentUserId = TryGetCurrentUserId();
-            var result = await _blogService.GetBlogsAsync(page, pageSize, category, search, currentUserId, userId);
+            var result = await _blogService.GetBlogsAsync(page, pageSize, category, search, currentUserId, userId, sortBy);
             return Ok(result);
         }
 
@@ -40,7 +41,7 @@ namespace BlogApp.API.Controllers
         }
 
         /// <summary>Get a single blog by ID</summary>
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetBlog(int id)
         {
             try
@@ -67,7 +68,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Update a blog post</summary>
         [Authorize]
-        [HttpPut("{id:int}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBlog(int id, [FromBody] UpdateBlogDto dto)
         {
             try
@@ -84,7 +85,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Delete a blog post</summary>
         [Authorize]
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBlog(int id)
         {
             try
@@ -114,7 +115,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Toggle like on a blog post</summary>
         [Authorize]
-        [HttpPost("{id:int}/like")]
+        [HttpPost("{id}/like")]
         public async Task<IActionResult> ToggleLike(int id)
         {
             var userId = GetCurrentUserId();
@@ -124,7 +125,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Toggle save/unsave on a blog post</summary>
         [Authorize]
-        [HttpPost("{id:int}/save")]
+        [HttpPost("{id}/save")]
         public async Task<IActionResult> ToggleSave(int id)
         {
             var userId = GetCurrentUserId();
@@ -142,22 +143,8 @@ namespace BlogApp.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>Get blogs interacted by current user (liked, saved, commented)</summary>
-        [Authorize]
-        [HttpGet("interacted")]
-        public async Task<IActionResult> GetInteractedBlogs(
-            [FromQuery] int page = 1, 
-            [FromQuery] int pageSize = 10,
-            [FromQuery] string? category = null,
-            [FromQuery] string? search = null)
-        {
-            var userId = GetCurrentUserId();
-            var result = await _blogService.GetInteractedBlogsAsync(userId, page, pageSize, category, search);
-            return Ok(result);
-        }
-
         /// <summary>Get comments for a blog post</summary>
-        [HttpGet("{id:int}/comments")]
+        [HttpGet("{id}/comments")]
         public async Task<IActionResult> GetComments(int id)
         {
             var result = await _blogService.GetCommentsAsync(id);
@@ -166,7 +153,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Add a comment to a blog post</summary>
         [Authorize]
-        [HttpPost("{id:int}/comments")]
+        [HttpPost("{id}/comments")]
         public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentDto dto)
         {
             var userId = GetCurrentUserId();
@@ -176,7 +163,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Delete a comment</summary>
         [Authorize]
-        [HttpDelete("{blogId:int}/comments/{commentId:int}")]
+        [HttpDelete("{blogId}/comments/{commentId}")]
         public async Task<IActionResult> DeleteComment(int blogId, int commentId)
         {
             try

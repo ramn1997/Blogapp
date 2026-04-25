@@ -17,6 +17,7 @@ namespace BlogApp.API.Services
         Task<AuthResponseDto> OAuthLoginAsync(OAuthLoginDto dto);
         Task<UserProfileDto> GetProfileAsync(int userId);
         Task<UserProfileDto> UpdateProfileAsync(int userId, UpdateProfileDto dto);
+        Task<List<UserProfileDto>> GetAuthorsAsync(int count);
     }
 
     public class UpdateProfileDto
@@ -143,6 +144,16 @@ namespace BlogApp.API.Services
 
             await _context.SaveChangesAsync();
             return MapToProfile(user);
+        }
+
+        public async Task<List<UserProfileDto>> GetAuthorsAsync(int count)
+        {
+            var authors = await _context.Users
+                .OrderByDescending(u => u.Blogs.Count)
+                .Take(count)
+                .ToListAsync();
+
+            return authors.Select(MapToProfile).ToList();
         }
 
         private AuthResponseDto GenerateAuthResponse(User user)

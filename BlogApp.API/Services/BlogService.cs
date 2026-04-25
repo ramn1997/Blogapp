@@ -7,7 +7,7 @@ namespace BlogApp.API.Services
 {
     public interface IBlogService
     {
-        Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId, int? authorId = null);
+        Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId, int? authorId = null, string? sortBy = null);
         Task<BlogResponseDto> GetBlogByIdAsync(int id, int? currentUserId);
         Task<BlogResponseDto> CreateBlogAsync(int userId, CreateBlogDto dto);
         Task<BlogResponseDto> UpdateBlogAsync(int blogId, int userId, UpdateBlogDto dto);
@@ -20,7 +20,6 @@ namespace BlogApp.API.Services
         Task<List<string>> GetCategoriesAsync();
         Task<bool> ToggleSaveAsync(int blogId, int userId);
         Task<BlogListResponseDto> GetSavedBlogsAsync(int userId, int page, int pageSize);
-        Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize, string? category = null, string? search = null);
     }
 
     public class BlogService : IBlogService
@@ -51,7 +50,7 @@ namespace BlogApp.API.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId, int? authorId = null)
+        public async Task<BlogListResponseDto> GetBlogsAsync(int page, int pageSize, string? category, string? search, int? currentUserId, int? authorId = null, string? sortBy = null)
         {
             var query = _context.Blogs
                 .Include(b => b.Author)
@@ -71,8 +70,23 @@ namespace BlogApp.API.Services
                 query = query.Where(b => b.Title.Contains(search) || b.Content.Contains(search) || (b.Tags != null && b.Tags.Contains(search)));
 
             var total = await query.CountAsync();
+            
+            if (sortBy == "trending")
+            {
+                query = query.OrderByDescending(b => b.BlogLikes.Count)
+                             .ThenByDescending(b => b.ViewCount)
+                             .ThenByDescending(b => b.PublishedAt);
+            }
+            else if (sortBy == "latest")
+            {
+                query = query.OrderByDescending(b => b.PublishedAt);
+            }
+            else
+            {
+                query = query.OrderByDescending(b => b.PublishedAt);
+            }
+
             var items = await query
-                .OrderByDescending(b => b.PublishedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -336,63 +350,6 @@ namespace BlogApp.API.Services
             return new BlogListResponseDto
             {
                 Items = items.Select(sb => MapToBlogResponse(sb.Blog, userId)).ToList(),
-                TotalCount = total,
-                Page = page,
-                PageSize = pageSize,
-                TotalPages = (int)Math.Ceiling((double)total / pageSize)
-            };
-        }
-
-        public async Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize, string? category = null, string? search = null)
-        {
-            // Blogs that the user liked
-            var likedIds = await _context.BlogLikes
-                .Where(bl => bl.UserId == userId)
-                .Select(bl => bl.BlogId)
-                .ToListAsync();
-
-            // Blogs that the user saved
-            var savedIds = await _context.SavedBlogs
-                .Where(sb => sb.UserId == userId)
-                .Select(sb => sb.BlogId)
-                .ToListAsync();
-
-            // Blogs that the user commented on
-            var commentedIds = await _context.Comments
-                .Where(c => c.UserId == userId)
-                .Select(c => c.BlogId)
-                .ToListAsync();
-
-            // Combine all IDs and remove duplicates
-            var interactedBlogIds = likedIds
-                .Concat(savedIds)
-                .Concat(commentedIds)
-                .Distinct()
-                .ToList();
-
-            var query = _context.Blogs
-                .Include(b => b.Author)
-                .Include(b => b.BlogLikes)
-                .Include(b => b.SavedBlogs)
-                .Include(b => b.Comments)
-                .Where(b => interactedBlogIds.Contains(b.Id) && b.IsPublished);
-
-            if (!string.IsNullOrWhiteSpace(category))
-                query = query.Where(b => b.Category == category);
-
-            if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(b => b.Title.Contains(search) || b.Content.Contains(search));
-
-            var total = await query.CountAsync();
-            var items = await query
-                .OrderByDescending(b => b.PublishedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new BlogListResponseDto
-            {
-                Items = items.Select(b => MapToBlogResponse(b, userId)).ToList(),
                 TotalCount = total,
                 Page = page,
                 PageSize = pageSize,
