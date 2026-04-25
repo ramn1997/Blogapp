@@ -346,25 +346,29 @@ namespace BlogApp.API.Services
         public async Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize)
         {
             // Blogs that the user liked
-            var likedBlogIds = _context.BlogLikes
+            var likedIds = await _context.BlogLikes
                 .Where(bl => bl.UserId == userId)
-                .Select(bl => bl.BlogId);
+                .Select(bl => bl.BlogId)
+                .ToListAsync();
 
             // Blogs that the user saved
-            var savedBlogIds = _context.SavedBlogs
+            var savedIds = await _context.SavedBlogs
                 .Where(sb => sb.UserId == userId)
-                .Select(sb => sb.BlogId);
+                .Select(sb => sb.BlogId)
+                .ToListAsync();
 
             // Blogs that the user commented on
-            var commentedBlogIds = _context.Comments
+            var commentedIds = await _context.Comments
                 .Where(c => c.UserId == userId)
-                .Select(c => c.BlogId);
-
-            // Combine all IDs
-            var interactedBlogIds = await likedBlogIds
-                .Union(savedBlogIds)
-                .Union(commentedBlogIds)
+                .Select(c => c.BlogId)
                 .ToListAsync();
+
+            // Combine all IDs and remove duplicates
+            var interactedBlogIds = likedIds
+                .Concat(savedIds)
+                .Concat(commentedIds)
+                .Distinct()
+                .ToList();
 
             var query = _context.Blogs
                 .Include(b => b.Author)
