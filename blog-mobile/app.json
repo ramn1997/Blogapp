@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "blog-mobile",
-    "slug": "blog-mobile",
+    "name": "Scribeflow",
+    "slug": "scribeflow",
     "scheme": "scribeflow",
     "version": "1.0.0",
     "orientation": "portrait",
