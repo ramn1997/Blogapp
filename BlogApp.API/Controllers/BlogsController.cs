@@ -40,7 +40,7 @@ namespace BlogApp.API.Controllers
         }
 
         /// <summary>Get a single blog by ID</summary>
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetBlog(int id)
         {
             try
@@ -67,7 +67,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Update a blog post</summary>
         [Authorize]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateBlog(int id, [FromBody] UpdateBlogDto dto)
         {
             try
@@ -84,7 +84,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Delete a blog post</summary>
         [Authorize]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteBlog(int id)
         {
             try
@@ -114,7 +114,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Toggle like on a blog post</summary>
         [Authorize]
-        [HttpPost("{id}/like")]
+        [HttpPost("{id:int}/like")]
         public async Task<IActionResult> ToggleLike(int id)
         {
             var userId = GetCurrentUserId();
@@ -124,7 +124,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Toggle save/unsave on a blog post</summary>
         [Authorize]
-        [HttpPost("{id}/save")]
+        [HttpPost("{id:int}/save")]
         public async Task<IActionResult> ToggleSave(int id)
         {
             var userId = GetCurrentUserId();
@@ -157,7 +157,7 @@ namespace BlogApp.API.Controllers
         }
 
         /// <summary>Get comments for a blog post</summary>
-        [HttpGet("{id}/comments")]
+        [HttpGet("{id:int}/comments")]
         public async Task<IActionResult> GetComments(int id)
         {
             var result = await _blogService.GetCommentsAsync(id);
@@ -166,7 +166,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Add a comment to a blog post</summary>
         [Authorize]
-        [HttpPost("{id}/comments")]
+        [HttpPost("{id:int}/comments")]
         public async Task<IActionResult> AddComment(int id, [FromBody] CreateCommentDto dto)
         {
             var userId = GetCurrentUserId();
@@ -176,7 +176,7 @@ namespace BlogApp.API.Controllers
 
         /// <summary>Delete a comment</summary>
         [Authorize]
-        [HttpDelete("{blogId}/comments/{commentId}")]
+        [HttpDelete("{blogId:int}/comments/{commentId:int}")]
         public async Task<IActionResult> DeleteComment(int blogId, int commentId)
         {
             try
