@@ -20,7 +20,7 @@ namespace BlogApp.API.Services
         Task<List<string>> GetCategoriesAsync();
         Task<bool> ToggleSaveAsync(int blogId, int userId);
         Task<BlogListResponseDto> GetSavedBlogsAsync(int userId, int page, int pageSize);
-        Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize);
+        Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize, string? category = null, string? search = null);
     }
 
     public class BlogService : IBlogService
@@ -343,7 +343,7 @@ namespace BlogApp.API.Services
             };
         }
 
-        public async Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize)
+        public async Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize, string? category = null, string? search = null)
         {
             // Blogs that the user liked
             var likedIds = await _context.BlogLikes
@@ -376,6 +376,12 @@ namespace BlogApp.API.Services
                 .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
                 .Where(b => interactedBlogIds.Contains(b.Id) && b.IsPublished);
+
+            if (!string.IsNullOrWhiteSpace(category))
+                query = query.Where(b => b.Category == category);
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(b => b.Title.Contains(search) || b.Content.Contains(search));
 
             var total = await query.CountAsync();
             var items = await query

@@ -117,8 +117,8 @@ const HomeScreen = ({ route, navigation }: any) => {
       const newBlogs = response.data.items || [];
       setBlogs(prev => shouldAppend ? [...prev, ...newBlogs] : newBlogs);
       setHasMore(newBlogs.length === 10);
-    } catch (error) {
-      console.error('Failed to fetch blogs:', error);
+    } catch (error: any) {
+      console.error('Failed to fetch blogs:', error.response?.data || error.message);
     } finally {
       if (isMounted.current) {
         setLoading(false);
