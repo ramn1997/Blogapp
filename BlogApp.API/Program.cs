@@ -60,7 +60,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "BlogApp API",
         Version = "v1",
-        Description = "Blog platform API with Google & Microsoft OAuth support"
+        Description = "Blog platform API with Google OAuth support"
     });
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -105,7 +105,7 @@ app.UseCors("AllowAngular");
 // Setup persistent uploads directory for Azure Containers
 var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
 var uploadBaseUrl = isAzure ? "/home/site/wwwroot" : (app.Environment.WebRootPath ?? "wwwroot");
-var uploadsPath = Path.Combine(uploadBaseUrl, "uploads");
+var uploadsPath = Path.GetFullPath(Path.Combine(uploadBaseUrl, "uploads"));
 
 if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
 

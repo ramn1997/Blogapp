@@ -1,7 +1,7 @@
 
 .auth-page-wrapper {
     min-height: 100vh;
-    background-color: #f9f7f2;
+    background-color: var(--bg-secondary);
     background-image: 
         linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: center;
     font-family: 'Inter', sans-serif;
-    color: #1a1a1a;
+    color: var(--text-primary);
     padding: 40px 20px;
 }
 
@@ -40,7 +40,7 @@
 
 /* Auth Card */
 .auth-card {
-    background: var(--bg-card)fff;
+    background: var(--bg-card);
     width: 100%;
     max-width: 500px;
     padding: 60px 48px;
@@ -103,7 +103,7 @@
 .form-input {
     width: 100%;
     border: none;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border);
     padding: 10px 0;
     font-size: 1rem;
     color: var(--text-primary);
@@ -197,6 +197,9 @@
 
 .social-grid.single-social {
     grid-template-columns: 1fr;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .social-btn {
@@ -204,8 +207,8 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: var(--bg-card)fff;
-    border: 1px solid #f0f0f0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     padding: 14px;
     font-size: 0.7rem;
     font-weight: 700;
@@ -218,8 +221,8 @@
 }
 
 .social-btn:hover {
-    background: #fafafa;
-    border-color: #e0e0e0;
+    background: var(--dropdown-hover);
+    border-color: var(--text-muted);
 }
 
 .social-icon {
@@ -255,10 +258,10 @@
 }
 
 .alert-error {
-    background: var(--bg-card)5f5;
-    color: #c53030;
+    background: rgba(229, 62, 62, 0.1);
+    color: #e53e3e;
     padding: 12px;
-    border-left: 4px solid #c53030;
+    border-left: 4px solid #e53e3e;
     font-size: 0.85rem;
     margin-bottom: 20px;
 }

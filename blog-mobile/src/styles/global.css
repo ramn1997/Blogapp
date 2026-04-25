@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #f9f7f2;
+    --card: #ffffff;
+    --border: #eeeeee;
+    --text-primary: #111111;
+    --text-secondary: #444444;
+    --text-muted: #888888;
+    --secondary: #eeeeee;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #111111;
+      --card: #1a1a1a;
+      --border: #333333;
+      --text-primary: #f9f7f2;
+      --text-secondary: #cccccc;
+      --text-muted: #888888;
+      --secondary: #aaaaaa;
+    }
+  }
+}

@@ -20,6 +20,7 @@ namespace BlogApp.API.Services
         Task<List<string>> GetCategoriesAsync();
         Task<bool> ToggleSaveAsync(int blogId, int userId);
         Task<BlogListResponseDto> GetSavedBlogsAsync(int userId, int page, int pageSize);
+        Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize);
     }
 
     public class BlogService : IBlogService
@@ -335,6 +336,53 @@ namespace BlogApp.API.Services
             return new BlogListResponseDto
             {
                 Items = items.Select(sb => MapToBlogResponse(sb.Blog, userId)).ToList(),
+                TotalCount = total,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double)total / pageSize)
+            };
+        }
+
+        public async Task<BlogListResponseDto> GetInteractedBlogsAsync(int userId, int page, int pageSize)
+        {
+            // Blogs that the user liked
+            var likedBlogIds = _context.BlogLikes
+                .Where(bl => bl.UserId == userId)
+                .Select(bl => bl.BlogId);
+
+            // Blogs that the user saved
+            var savedBlogIds = _context.SavedBlogs
+                .Where(sb => sb.UserId == userId)
+                .Select(sb => sb.BlogId);
+
+            // Blogs that the user commented on
+            var commentedBlogIds = _context.Comments
+                .Where(c => c.UserId == userId)
+                .Select(c => c.BlogId);
+
+            // Combine all IDs
+            var interactedBlogIds = await likedBlogIds
+                .Union(savedBlogIds)
+                .Union(commentedBlogIds)
+                .ToListAsync();
+
+            var query = _context.Blogs
+                .Include(b => b.Author)
+                .Include(b => b.BlogLikes)
+                .Include(b => b.SavedBlogs)
+                .Include(b => b.Comments)
+                .Where(b => interactedBlogIds.Contains(b.Id) && b.IsPublished);
+
+            var total = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(b => b.PublishedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new BlogListResponseDto
+            {
+                Items = items.Select(b => MapToBlogResponse(b, userId)).ToList(),
                 TotalCount = total,
                 Page = page,
                 PageSize = pageSize,

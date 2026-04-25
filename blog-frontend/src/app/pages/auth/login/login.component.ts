@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -21,7 +21,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -34,6 +35,10 @@ export class LoginComponent implements OnInit {
 
     this.initGoogleSignIn();
   }
+
+
+
+  // ── Google ────────────────────────────────────────────────────────────────────
 
   private initGoogleSignIn(): void {
     setTimeout(() => {
@@ -53,9 +58,9 @@ export class LoginComponent implements OnInit {
   }
 
   private handleGoogleCallback(response: any): void {
-    // Decode JWT payload
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
     this.loading = true;
+    this.error = '';
     this.authService.oauthLogin({
       provider: 'google',
       idToken: response.credential,
@@ -72,18 +77,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  onMicrosoftLogin(): void {
-    this.loading = true;
-    this.error = '';
-    this.authService.microsoftLogin().subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (err: any) => {
-        console.error('Microsoft login error:', err);
-        this.error = err?.message || err?.error?.message || 'Microsoft sign-in failed.';
-        this.loading = false;
-      }
-    });
-  }
+  // ── Email / Password ──────────────────────────────────────────────────────────
 
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }

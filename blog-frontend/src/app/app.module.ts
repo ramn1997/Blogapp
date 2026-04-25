@@ -15,22 +15,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { BlogCardComponent } from './components/blog-card/blog-card.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
-import { MsalModule, MSAL_INSTANCE, MsalService } from '@azure/msal-angular';
-import { IPublicClientApplication, PublicClientApplication, BrowserCacheLocation } from '@azure/msal-browser';
-import { environment } from '../environments/environment';
-
-export function MSALInstanceFactory(): IPublicClientApplication {
-  return new PublicClientApplication({
-    auth: {
-      clientId: environment.microsoftClientId,
-      authority: 'https://login.microsoftonline.com/common',
-      redirectUri: window.location.origin
-    },
-    cache: {
-      cacheLocation: BrowserCacheLocation.SessionStorage
-    }
-  });
-}
+import { AuthService } from './services/auth.service';
 
 @NgModule({
   declarations: [
@@ -50,13 +35,10 @@ export function MSALInstanceFactory(): IPublicClientApplication {
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule,
-    MsalModule
+    ReactiveFormsModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: MSAL_INSTANCE, useFactory: MSALInstanceFactory },
-    MsalService
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

@@ -52,7 +52,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
             ],
             "styles": [
               "src/styles.css"

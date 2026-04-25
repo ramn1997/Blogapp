@@ -2,7 +2,15 @@
 <html lang="en">
 
 <head>
+  <!-- MSAL Popup Handler -->
+  <script>
+    if (window.opener && window.opener !== window && (window.location.hash || window.location.search)) {
+      document.documentElement.style.display = 'none';
+      setTimeout(() => { if (window.opener && !window.opener.closed) window.close(); }, 5000);
+    }
+  </script>
   <meta charset="utf-8">
+  <base href="/">
   <title>Scribeflow – A Modern Blog Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="ThoughtStream – Write, publish, and discover insightful blog posts on any topic.">

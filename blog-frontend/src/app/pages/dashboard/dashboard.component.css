@@ -38,7 +38,7 @@
     background: var(--bg-card);
     padding: 24px;
     border-radius: 12px;
-    border: 1px solid #f0f0f0;
+    border: 1px solid var(--border);
     transition: all 0.3s ease;
 }
 
@@ -75,7 +75,7 @@
     color: var(--text-primary);
     margin-bottom: 32px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .dashboard-grid {
@@ -88,9 +88,9 @@
 .empty-dashboard {
     text-align: center;
     padding: 100px 20px;
-    background: #fafafa;
+    background: var(--bg-secondary);
     border-radius: 20px;
-    border: 1px dashed #eee;
+    border: 1px dashed var(--border);
 }
 
 .empty-dashboard .material-icons {
@@ -109,7 +109,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
     display: flex;
     align-items: center;

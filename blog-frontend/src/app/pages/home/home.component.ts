@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Blog, BlogListResponse } from '../../models';
 import { BlogService } from '../../services/blog.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: false,
@@ -21,6 +22,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private blogService: BlogService,
+    private authService: AuthService,
     private route: ActivatedRoute
   ) { }
 
@@ -39,15 +41,20 @@ export class HomeComponent implements OnInit {
   loadBlogs(page = 1): void {
     this.loading = true;
     this.currentPage = page;
-    this.blogService.getBlogs(page, this.pageSize, this.selectedCategory || undefined, this.searchQuery || undefined)
-      .subscribe({
-        next: (res: BlogListResponse) => {
-          this.blogs = res.items;
-          this.totalPages = res.totalPages;
-          this.loading = false;
-        },
-        error: () => { this.loading = false; }
-      });
+
+    // Logic: If logged in, show interacted posts. If not, show all.
+    const blogObs = this.authService.isLoggedIn
+      ? this.blogService.getInteractedBlogs(page, this.pageSize)
+      : this.blogService.getBlogs(page, this.pageSize, this.selectedCategory || undefined, this.searchQuery || undefined);
+
+    blogObs.subscribe({
+      next: (res: BlogListResponse) => {
+        this.blogs = res.items;
+        this.totalPages = res.totalPages;
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
+    });
   }
 
   onSearch(): void { this.loadBlogs(1); }

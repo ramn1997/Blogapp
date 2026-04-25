@@ -18,7 +18,7 @@ namespace BlogApp.API.Models
         public string? PasswordHash { get; set; }
 
         [MaxLength(50)]
-        public string? Provider { get; set; } // "local", "google", "microsoft"
+        public string? Provider { get; set; } // "local", "google"
 
         public string? ProviderId { get; set; }
 

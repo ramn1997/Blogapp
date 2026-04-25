@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -21,7 +21,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -36,6 +37,8 @@ export class RegisterComponent implements OnInit {
 
     this.initGoogleSignIn();
   }
+
+
 
   private initGoogleSignIn(): void {
     setTimeout(() => {
@@ -73,19 +76,9 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  onMicrosoftLogin(): void {
-    this.loading = true;
-    this.error = '';
-    this.authService.microsoftLogin().subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (err: any) => {
-        this.error = err?.error?.message || 'Microsoft sign-up failed.';
-        this.loading = false;
-      }
-    });
-  }
 
-  onSubmit(): void {
+
+    onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true;
     this.error = '';

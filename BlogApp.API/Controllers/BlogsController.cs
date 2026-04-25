@@ -142,6 +142,16 @@ namespace BlogApp.API.Controllers
             return Ok(result);
         }
 
+        /// <summary>Get blogs interacted by current user (liked, saved, commented)</summary>
+        [Authorize]
+        [HttpGet("interacted")]
+        public async Task<IActionResult> GetInteractedBlogs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var userId = GetCurrentUserId();
+            var result = await _blogService.GetInteractedBlogsAsync(userId, page, pageSize);
+            return Ok(result);
+        }
+
         /// <summary>Get comments for a blog post</summary>
         [HttpGet("{id}/comments")]
         public async Task<IActionResult> GetComments(int id)

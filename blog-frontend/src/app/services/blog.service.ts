@@ -71,6 +71,12 @@ export class BlogService {
         });
     }
 
+    getInteractedBlogs(page = 1, pageSize = 9) {
+        return this.http.get<BlogListResponse>(`${this.API}/interacted`, {
+            params: new HttpParams().set('page', page).set('pageSize', pageSize)
+        });
+    }
+
     uploadImage(file: File) {
         const formData = new FormData();
         formData.append('file', file);
