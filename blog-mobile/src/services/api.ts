@@ -6,9 +6,10 @@ import { Platform } from 'react-native';
 // Detected your machine's IP as 192.168.1.8
 // For Android Emulators, 10.0.2.2 always points to your machine's localhost.
 const MACHINE_IP = '192.168.1.4'; 
-export const API_BASE_URL = MACHINE_IP 
-  ? `http://${MACHINE_IP}:5204` 
-  : (Platform.OS === 'android' ? 'http://10.0.2.2:5204' : 'http://localhost:5204');
+const DEV_API = `http://${MACHINE_IP}:5204`;
+const PROD_API = 'https://scribeflow-api-c9d9dhg5c3g3d4hn.centralus-01.azurewebsites.net';
+
+export const API_BASE_URL = __DEV__ ? DEV_API : PROD_API;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
