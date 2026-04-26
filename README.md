@@ -5,7 +5,7 @@ A modern, magazine-inspired blogging platform built with **Angular 19** + **ASP.
 ## Live URLs
 
 *   **Frontend**: [https://ramn1997.github.io/Blogapp/](https://ramn1997.github.io/Blogapp/)
-*   **Backend (API)**: [http://localhost:5000](http://localhost:5000) (Local)
+*   **Backend (API)**: [http://localhost:5204](http://localhost:5204) (Local)
 *   **API Public Image**: `ghcr.io/ramn1997/blogapp-api:latest`
 
 ---
@@ -78,7 +78,7 @@ Edit `BlogApp.API/appsettings.json`:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=BlogAppDb;Trusted_Connection=True;TrustServerCertificate=True;"
+    "DefaultConnection": "Server=localhost;Database=BlogAppDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
   },
   "Jwt": {
     "Key": "CHANGE_THIS_TO_STRONG_SECRET_KEY_32+_CHARS",
@@ -93,8 +93,8 @@ Edit `BlogApp.API/appsettings.json`:
 ```powershell
 cd BlogApp.API
 dotnet ef database update   # Creates DB and runs migrations
-dotnet run                  # Starts on http://localhost:5000
-# Swagger: http://localhost:5000/swagger
+dotnet run                  # Starts on http://localhost:5204
+# Swagger: http://localhost:5204/swagger
 ```
 
 ### 3. Configure Angular
@@ -104,7 +104,7 @@ Edit `blog-frontend/src/environments/environment.ts`:
 ```typescript
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000',
+  apiUrl: 'http://localhost:5204',
   googleClientId: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
 };
 ```
@@ -194,7 +194,7 @@ The workflow (`.github/workflows/ci-cd.yml`) runs on push to `main`:
 | `POST` | `/api/blogs/{id}/comments` | Yes | Add comment |
 | `DELETE` | `/api/blogs/{id}/comments/{cid}` | Yes | Delete comment |
 
-Full Swagger docs at: `http://localhost:5000/swagger`
+Full Swagger docs at: `http://localhost:5204/swagger`
 
 ---
 

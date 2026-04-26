@@ -47,7 +47,12 @@ builder.Services.AddCors(options =>
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowCredentials()
+            .SetIsOriginAllowed(origin => 
+            {
+                var host = new Uri(origin).Host;
+                return host == "localhost" || host == "127.0.0.1" || host.EndsWith(".github.io");
+            });
     });
 });
 
@@ -92,6 +97,11 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+});
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -99,8 +109,8 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
+app.UseHttpsRedirection();
 
 // Setup persistent uploads directory for Azure Containers
 var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));

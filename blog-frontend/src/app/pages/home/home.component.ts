@@ -15,7 +15,7 @@ import { catchError } from 'rxjs/operators';
 export class HomeComponent implements OnInit {
   latestBlogs: Blog[] = [];
   trendingBlogs: Blog[] = [];
-  authors: User[] = [];
+
   savedBlogs: Blog[] = [];
   categories: string[] = [];
   
@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit {
     const requests = {
       latest: this.blogService.getBlogs(1, this.pageSize, this.selectedCategory || undefined, this.searchQuery || undefined, undefined, 'latest').pipe(catchError(() => of({ items: [], totalPages: 1 }))),
       trending: this.blogService.getBlogs(1, 5, undefined, undefined, undefined, 'trending').pipe(catchError(() => of({ items: [], totalPages: 1 }))),
-      authors: this.authService.getAuthors(8).pipe(catchError(() => of([]))),
+
       categories: this.blogService.getCategories().pipe(catchError(() => of([]))),
       saved: this.authService.isLoggedIn ? this.blogService.getSavedBlogs(1, 5).pipe(catchError(() => of({ items: [], totalPages: 1 }))) : of({ items: [], totalPages: 1 })
     };
@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
         this.latestBlogs = res.latest.items;
         this.totalPages = res.latest.totalPages;
         this.trendingBlogs = res.trending.items;
-        this.authors = res.authors;
+
         this.categories = res.categories;
         this.savedBlogs = res.saved.items;
         this.loading = false;

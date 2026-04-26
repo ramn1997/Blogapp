@@ -64,28 +64,7 @@ const TrendingBlogCard = ({ blog, navigation }: any) => {
   );
 };
 
-const AuthorCard = ({ author, navigation }: any) => {
-  const avatarUrl = getImageUrl(author.avatarUrl);
-  return (
-    <TouchableOpacity 
-      onPress={() => navigation.navigate('AuthorProfile', { 
-        authorId: author.id, 
-        authorName: author.fullName,
-        authorAvatar: author.avatarUrl
-      })}
-      className="items-center mr-8"
-    >
-      <View className="w-16 h-16 rounded-full bg-accent/10 items-center justify-center border border-accent/20 overflow-hidden mb-2">
-         {author.avatarUrl ? (
-           <Image source={{ uri: avatarUrl }} className="w-full h-full" />
-         ) : (
-           <Text className="text-accent text-xl font-serif">{(author.fullName || 'U')[0]}</Text>
-         )}
-      </View>
-      <Text numberOfLines={1} className="text-text-primary text-[10px] font-bold w-16 text-center">{author.fullName?.split(' ')[0]}</Text>
-    </TouchableOpacity>
-  );
-};
+
 
 // --- Main Screen ---
 
@@ -95,7 +74,7 @@ const HomeScreen = ({ navigation }: any) => {
   
   const [latestBlogs, setLatestBlogs] = useState([]);
   const [trendingBlogs, setTrendingBlogs] = useState([]);
-  const [authors, setAuthors] = useState([]);
+
   const [savedBlogs, setSavedBlogs] = useState([]);
   const [categories, setCategories] = useState(['All']);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -116,11 +95,11 @@ const HomeScreen = ({ navigation }: any) => {
       // Fetch data with individual error handling
       const fetchLatest = api.get('/api/blogs', { params: { pageSize: 10, sortBy: 'latest', category: selectedCategory === 'All' ? undefined : selectedCategory } }).catch(() => ({ data: { items: [] } }));
       const fetchTrending = api.get('/api/blogs', { params: { pageSize: 5, sortBy: 'trending' } }).catch(() => ({ data: { items: [] } }));
-      const fetchAuthors = api.get('/api/auth/authors', { params: { count: 8 } }).catch(() => ({ data: [] }));
+
       const fetchCategories = api.get('/api/blogs/categories').catch(() => ({ data: [] }));
 
-      const [latestRes, trendingRes, authorsRes, categoriesRes] = await Promise.all([
-        fetchLatest, fetchTrending, fetchAuthors, fetchCategories
+      const [latestRes, trendingRes, categoriesRes] = await Promise.all([
+        fetchLatest, fetchTrending, fetchCategories
       ]);
 
       let savedRes = { data: { items: [] } };
@@ -131,7 +110,7 @@ const HomeScreen = ({ navigation }: any) => {
       if (isMounted.current) {
         setLatestBlogs(latestRes.data.items || []);
         setTrendingBlogs(trendingRes.data.items || []);
-        setAuthors(authorsRes.data || []);
+
         setCategories(['All', ...(categoriesRes.data || [])]);
         setSavedBlogs(savedRes.data.items || []);
       }
@@ -254,20 +233,7 @@ const HomeScreen = ({ navigation }: any) => {
         </View>
       )}
 
-      {/* Recommended Authors */}
-      {authors.length > 0 && (
-        <View>
-          <SectionHeader title="Writers to follow" />
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={authors}
-            keyExtractor={item => `author-${item.id}`}
-            renderItem={({ item }) => <AuthorCard author={item} navigation={navigation} />}
-            contentContainerStyle={{ paddingLeft: 24, paddingRight: 8 }}
-          />
-        </View>
-      )}
+
 
       {/* Latest Section Header */}
       <View className="mt-12 mb-2">

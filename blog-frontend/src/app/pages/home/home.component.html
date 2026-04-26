@@ -81,21 +81,7 @@
             </div>
         </section>
 
-        <!-- Authors Section -->
-        <section class="section-wrapper" *ngIf="authors.length > 0 && !searchQuery">
-            <div class="section-header">
-                <h2 class="serif">Writers to follow</h2>
-            </div>
-            <div class="horizontal-scroll">
-                <a [routerLink]="['/profile', author.id]" class="author-circle-card" *ngFor="let author of authors">
-                    <div class="author-avatar-lg">
-                        <img *ngIf="author.avatarUrl" [src]="author.avatarUrl" [alt]="author.fullName">
-                        <span *ngIf="!author.avatarUrl">{{ author.fullName[0] }}</span>
-                    </div>
-                    <span class="author-name-lg">{{ author.fullName }}</span>
-                </a>
-            </div>
-        </section>
+
 
         <!-- Main Feed (Latest) -->
         <section class="section-wrapper">
