@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { getImageUrl } from '../../utils/imageUtils';
 import { View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl, Image, Dimensions } from 'react-native';
 import api, { API_BASE_URL } from '../../services/api';
 import BlogCard from '../../components/BlogCard';
@@ -8,18 +9,7 @@ import { useAuthStore } from '../../store/authStore';
 
 const { width } = Dimensions.get('window');
 
-// --- Helper for image URLs ---
-const getImageUrl = (url?: string) => {
-  if (!url) return 'https://via.placeholder.com/600x300?text=Scribeflow';
-  let finalUrl = url;
-  if (url.includes('localhost') || url.includes('127.0.0.1')) {
-    finalUrl = url.replace('localhost', '192.168.1.4').replace('127.0.0.1', '192.168.1.4');
-  }
-  if (finalUrl.startsWith('http')) return finalUrl;
-  let cleanPath = finalUrl.replace(/\\/g, '/');
-  if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
-  return `${API_BASE_URL}/${cleanPath}`;
-};
+
 
 // --- Sub-components ---
 

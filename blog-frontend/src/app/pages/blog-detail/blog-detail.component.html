@@ -23,7 +23,7 @@
                     <a class="author-avatar-wrap" [routerLink]="['/profile']" [queryParams]="{userId: blog.author.id}">
                         <div class="avatar-stack">
                             <span class="material-icons author-fallback-icon">account_circle</span>
-                            <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName" 
+                            <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl | imageUrl" [alt]="blog.author.fullName" 
                                 class="author-mini-photo" loading="eager">
                         </div>
                     </a>
@@ -38,7 +38,7 @@
 
         <!-- Cover Image (Full Width) -->
         <div class="article-cover-wrap" *ngIf="blog.coverImageUrl">
-            <img [src]="blog.coverImageUrl" [alt]="blog.title" class="article-cover">
+            <img [src]="blog.coverImageUrl | imageUrl" [alt]="blog.title" class="article-cover">
         </div>
 
         <!-- Article Content -->
@@ -102,7 +102,7 @@
                             <div class="author-avatar-wrap clickable" [routerLink]="['/profile']" [queryParams]="{userId: comment.author.id}">
                                 <div class="avatar-stack">
                                     <span class="material-icons author-fallback-icon">account_circle</span>
-                                    <img *ngIf="comment.author.avatarUrl" [src]="comment.author.avatarUrl" [alt]="comment.author.fullName" 
+                                    <img *ngIf="comment.author.avatarUrl" [src]="comment.author.avatarUrl | imageUrl" [alt]="comment.author.fullName" 
                                         class="author-mini-photo" loading="lazy">
                                 </div>
                             </div>

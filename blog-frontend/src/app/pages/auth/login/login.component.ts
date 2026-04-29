@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { AuthenticationResult, PublicClientApplication } from '@azure/msal-browser';
 
 declare const google: any;
 
@@ -17,6 +18,7 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
   showPassword = false;
+  private msalClient?: PublicClientApplication;
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +36,7 @@ export class LoginComponent implements OnInit {
     });
 
     this.initGoogleSignIn();
+    this.initMicrosoftSignIn();
   }
 
 
@@ -78,6 +81,79 @@ export class LoginComponent implements OnInit {
   }
 
   // ── Email / Password ──────────────────────────────────────────────────────────
+
+  private async initMicrosoftSignIn(): Promise<void> {
+    if (!environment.microsoftClientId || environment.microsoftClientId.includes('YOUR_')) {
+      return;
+    }
+
+    this.msalClient = new PublicClientApplication({
+      auth: {
+        clientId: environment.microsoftClientId,
+        authority: `https://login.microsoftonline.com/${environment.microsoftTenantId || 'common'}`,
+        redirectUri: window.location.origin + window.location.pathname
+      },
+      cache: {
+        cacheLocation: 'sessionStorage'
+      }
+    });
+
+    await this.msalClient.initialize();
+
+    try {
+      const result = await this.msalClient.handleRedirectPromise();
+      if (result) {
+        this.loading = true;
+        this.handleMicrosoftCallback(result);
+      }
+    } catch (err) {
+      console.error('[Auth] Microsoft redirect error:', err);
+      this.error = 'Microsoft sign-in failed.';
+    }
+  }
+
+  async triggerMicrosoftLogin(): Promise<void> {
+    if (!this.msalClient) {
+      this.error = 'Microsoft sign-in is not configured yet.';
+      return;
+    }
+
+    this.loading = true;
+    this.error = '';
+
+    try {
+      await this.msalClient.loginRedirect({
+        scopes: ['openid', 'profile', 'email', 'User.Read'],
+        prompt: 'select_account'
+      });
+    } catch (err) {
+      console.error('[Auth] Microsoft sign-in failed:', err);
+      this.error = 'Microsoft sign-in failed.';
+      this.loading = false;
+    }
+  }
+
+  private handleMicrosoftCallback(result: AuthenticationResult): void {
+    if (!result.idToken || !result.account) {
+      this.error = 'Microsoft sign-in did not return an identity token.';
+      this.loading = false;
+      return;
+    }
+
+    this.authService.oauthLogin({
+      provider: 'microsoft',
+      idToken: result.idToken,
+      email: result.account.username,
+      fullName: result.account.name || result.account.username,
+      providerId: result.account.localAccountId
+    }).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: (err: any) => {
+        this.error = err?.error?.message || 'Microsoft sign-in failed.';
+        this.loading = false;
+      }
+    });
+  }
 
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }

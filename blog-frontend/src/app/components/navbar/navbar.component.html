@@ -61,7 +61,7 @@
                      [class.unread]="!notif.isRead"
                      (click)="markAsRead(notif)">
                     
-                    <img *ngIf="notif.actorAvatar" [src]="notif.actorAvatar" class="notif-avatar" alt="">
+                    <img *ngIf="notif.actorAvatar" [src]="notif.actorAvatar | imageUrl" class="notif-avatar" alt="">
                     <div *ngIf="!notif.actorAvatar" class="notif-avatar" 
                          style="background: #eee; display: flex; align-items: center; justify-content: center;">
                         <span class="material-icons" style="font-size: 1.2rem; color: #999;">person</span>
@@ -78,7 +78,7 @@
 
         <div class="user-menu-wrapper" *ngIf="currentUser">
           <button class="avatar-btn" (click)="toggleUserMenu($event)">
-            <img *ngIf="currentUser?.avatarUrl" [src]="currentUser!.avatarUrl" [alt]="currentUser!.fullName"
+            <img *ngIf="currentUser?.avatarUrl" [src]="currentUser!.avatarUrl | imageUrl" [alt]="currentUser!.fullName"
               class="avatar">
             <span *ngIf="!currentUser?.avatarUrl" class="avatar avatar-fallback">
               {{ getInitials(currentUser!.fullName) }}

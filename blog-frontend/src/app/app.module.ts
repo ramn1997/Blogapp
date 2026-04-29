@@ -16,6 +16,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { BlogCardComponent } from './components/blog-card/blog-card.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { AuthService } from './services/auth.service';
+import { ImageUrlPipe } from './pipes/image-url.pipe';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { AuthService } from './services/auth.service';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ImageUrlPipe
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }

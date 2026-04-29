@@ -26,7 +26,9 @@ namespace BlogApp.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetNotifications()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
 
             var notifications = await _context.Notifications
                 .Include(n => n.Actor)
@@ -52,7 +54,9 @@ namespace BlogApp.API.Controllers
         [HttpPost("{id}/read")]
         public async Task<IActionResult> MarkAsRead(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
             var notification = await _context.Notifications.FindAsync(id);
 
             if (notification == null || notification.UserId != userId)
@@ -67,7 +71,9 @@ namespace BlogApp.API.Controllers
         [HttpPost("read-all")]
         public async Task<IActionResult> MarkAllAsRead()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
             var notifications = await _context.Notifications
                 .Where(n => n.UserId == userId && !n.IsRead)
                 .ToListAsync();
@@ -81,7 +87,9 @@ namespace BlogApp.API.Controllers
         [HttpGet("unread-count")]
         public async Task<ActionResult<int>> GetUnreadCount()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
             var count = await _context.Notifications.CountAsync(n => n.UserId == userId && !n.IsRead);
             return Ok(count);
         }

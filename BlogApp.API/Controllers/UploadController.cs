@@ -37,10 +37,10 @@ namespace BlogApp.API.Controllers
             }
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-            if (!allowedExtensions.Contains(extension))
+            if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
             {
-                _logger.LogWarning("Invalid extension rejected: {Extension}", extension);
-                return BadRequest($"Invalid file type: {extension}");
+                _logger.LogWarning("Invalid or missing extension rejected: {Extension}", extension);
+                return BadRequest($"Invalid file type: {extension ?? "unknown"}");
             }
 
             var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
@@ -62,17 +62,11 @@ namespace BlogApp.API.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                var request = HttpContext.Request;
-                var scheme = request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? request.Scheme;
-                if (request.Host.Value.Contains("azurewebsites.net")) {
-                    scheme = "https";
-                }
-                var baseUrl = $"{scheme}://{request.Host}{request.PathBase}";
-                var finalUrl = $"{baseUrl}/uploads/{fileName}";
+                var relativeUrl = $"/uploads/{fileName}";
                 
-                _logger.LogInformation("Upload successful. URL: {Url}", finalUrl);
+                _logger.LogInformation("Upload successful. Relative URL: {Url}", relativeUrl);
 
-                return Ok(new { url = finalUrl });
+                return Ok(new { url = relativeUrl });
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { getImageUrl } from '../../utils/imageUtils';
 import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, Alert, TextInput, Share, KeyboardAvoidingView, Platform } from 'react-native';
 import api, { API_BASE_URL } from '../../services/api';
 import { Heart, MessageCircle, Bookmark, Share2, Eye, ArrowLeft } from 'lucide-react-native';
@@ -130,26 +131,6 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
         setSubmittingComment(false);
       }
     }
-  };
-
-  const getImageUrl = (url?: string) => {
-    if (!url) return 'https://via.placeholder.com/800x400?text=Scribeflow';
-    
-    // If backend returns 'localhost' or '127.0.0.1', replace it with our hardcoded IP for dev devices
-    let finalUrl = url;
-    if (url.includes('localhost') || url.includes('127.0.0.1')) {
-      finalUrl = url.replace('localhost', '192.168.1.4').replace('127.0.0.1', '192.168.1.4');
-    }
-
-    if (finalUrl.startsWith('http')) return finalUrl;
-    
-    // Normalize slashes for mixed backend environments (Windows/Linux)
-    let cleanPath = finalUrl.replace(/\\/g, '/');
-    if (cleanPath.startsWith('/')) {
-      cleanPath = cleanPath.substring(1);
-    }
-    
-    return `${API_BASE_URL}/${cleanPath}`;
   };
 
   if (loading) return (

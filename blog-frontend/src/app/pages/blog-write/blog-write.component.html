@@ -20,7 +20,7 @@
              (drop)="onDropCover($event)">
             
             <input type="file" #coverInput style="display: none" (change)="onCoverSelected($event)" accept="image/*">
-            <img *ngIf="form.get('coverImageUrl')?.value" [src]="form.get('coverImageUrl')?.value" class="cover-image-actual">
+            <img *ngIf="form.get('coverImageUrl')?.value" [src]="form.get('coverImageUrl')?.value | imageUrl" class="cover-image-actual">
             
             <div class="cover-overlay" *ngIf="form.get('coverImageUrl')?.value">
                  <span class="material-icons">edit</span> Change Cover

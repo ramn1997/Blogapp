@@ -225,11 +225,29 @@
     border-color: var(--text-muted);
 }
 
+.social-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
 .social-icon {
     width: 16px;
     height: 16px;
     object-fit: contain;
 }
+
+.microsoft-mark {
+    width: 16px;
+    height: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+}
+
+.microsoft-mark span:nth-child(1) { background: #f35325; }
+.microsoft-mark span:nth-child(2) { background: #81bc06; }
+.microsoft-mark span:nth-child(3) { background: #05a6f0; }
+.microsoft-mark span:nth-child(4) { background: #ffba08; }
 
 /* Card Footer */
 .card-footer {

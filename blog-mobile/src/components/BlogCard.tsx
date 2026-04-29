@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getImageUrl } from '../utils/imageUtils';
 import { View, Text, Image, TouchableOpacity, Alert, Pressable, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import api, { API_BASE_URL } from '../services/api';
@@ -27,26 +28,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog: initialBlog, onEdit, onDelete
   const { user } = useAuthStore();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
-
-  const getImageUrl = (url?: string) => {
-    if (!url) return 'https://via.placeholder.com/600x300?text=Scribeflow';
-    
-    // If backend returns 'localhost' or '127.0.0.1', replace it with our hardcoded IP for dev devices
-    let finalUrl = url;
-    if (url.includes('localhost') || url.includes('127.0.0.1')) {
-      finalUrl = url.replace('localhost', '192.168.1.4').replace('127.0.0.1', '192.168.1.4');
-    }
-
-    if (finalUrl.startsWith('http')) return finalUrl;
-    
-    // Normalize slashes for mixed backend environments (Windows/Linux)
-    let cleanPath = finalUrl.replace(/\\/g, '/');
-    if (cleanPath.startsWith('/')) {
-      cleanPath = cleanPath.substring(1);
-    }
-    
-    return `${API_BASE_URL}/${cleanPath}`;
-  };
 
   const handleSave = async () => {
     if (!user) {

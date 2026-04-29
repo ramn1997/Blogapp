@@ -2,6 +2,8 @@ using BlogApp.API.Data;
 using BlogApp.API.DTOs.Auth;
 using BlogApp.API.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -80,6 +82,8 @@ namespace BlogApp.API.Services
 
         public async Task<AuthResponseDto> OAuthLoginAsync(OAuthLoginDto dto)
         {
+            dto = await ValidateOAuthLoginAsync(dto);
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Provider == dto.Provider && u.ProviderId == dto.ProviderId);
 
@@ -121,6 +125,102 @@ namespace BlogApp.API.Services
 
             await _context.SaveChangesAsync();
             return GenerateAuthResponse(user);
+        }
+
+        private async Task<OAuthLoginDto> ValidateOAuthLoginAsync(OAuthLoginDto dto)
+        {
+            dto.Provider = dto.Provider.Trim().ToLowerInvariant();
+
+            if (dto.Provider is "azure" or "microsoft")
+            {
+                return await ValidateMicrosoftLoginAsync(dto);
+            }
+
+            return dto;
+        }
+
+        private async Task<OAuthLoginDto> ValidateMicrosoftLoginAsync(OAuthLoginDto dto)
+        {
+            var clientId = _configuration["Authentication:Microsoft:ClientId"];
+            var mobileClientId = _configuration["Authentication:Microsoft:MobileClientId"];
+            var tenantId = _configuration["Authentication:Microsoft:TenantId"] ?? "common";
+
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw new InvalidOperationException("Microsoft authentication is not configured.");
+            }
+
+            var validAudiences = new List<string> { clientId };
+            if (!string.IsNullOrWhiteSpace(mobileClientId))
+            {
+                validAudiences.Add(mobileClientId);
+            }
+
+            var authority = $"https://login.microsoftonline.com/{tenantId}/v2.0";
+            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                $"{authority}/.well-known/openid-configuration",
+                new OpenIdConnectConfigurationRetriever());
+
+            var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidAudiences = validAudiences,
+                IssuerSigningKeys = openIdConfig.SigningKeys,
+                IssuerValidator = (issuer, token, parameters) =>
+                {
+                    var tokenTenantId = GetJwtValue(token, "tid");
+                    var expectedIssuer = $"https://login.microsoftonline.com/{tokenTenantId}/v2.0";
+
+                    if (!string.IsNullOrWhiteSpace(tokenTenantId) &&
+                        issuer.Equals(expectedIssuer, StringComparison.OrdinalIgnoreCase) &&
+                        (tenantId.Equals("common", StringComparison.OrdinalIgnoreCase) ||
+                         tenantId.Equals("organizations", StringComparison.OrdinalIgnoreCase) ||
+                         tenantId.Equals("consumers", StringComparison.OrdinalIgnoreCase) ||
+                         tenantId.Equals(tokenTenantId, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return issuer;
+                    }
+
+                    throw new SecurityTokenInvalidIssuerException("Invalid Microsoft token issuer.");
+                }
+            };
+
+            var principal = new JwtSecurityTokenHandler()
+                .ValidateToken(dto.IdToken, validationParameters, out _);
+
+            var providerId = principal.FindFirstValue("oid")
+                ?? principal.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? principal.FindFirstValue("sub")
+                ?? throw new SecurityTokenValidationException("Microsoft token does not include a user id.");
+
+            var email = principal.FindFirstValue("preferred_username")
+                ?? principal.FindFirstValue(ClaimTypes.Email)
+                ?? principal.FindFirstValue("email")
+                ?? throw new SecurityTokenValidationException("Microsoft token does not include an email address.");
+
+            return new OAuthLoginDto
+            {
+                Provider = "microsoft",
+                IdToken = dto.IdToken,
+                Email = email,
+                FullName = principal.FindFirstValue("name") ?? dto.FullName ?? email,
+                AvatarUrl = dto.AvatarUrl,
+                ProviderId = providerId
+            };
+        }
+
+        private static string? GetJwtValue(SecurityToken token, string claimType)
+        {
+            if (token is JwtSecurityToken jwt)
+            {
+                return jwt.Claims.FirstOrDefault(c => c.Type == claimType)?.Value;
+            }
+
+            return null;
         }
 
         public async Task<UserProfileDto> GetProfileAsync(int userId)

@@ -100,7 +100,9 @@ jobs:
         working-directory: ./blog-frontend
 
       - name: Build Angular app
-        run: npm run build -- --base-href /Blogapp/
+        run: |
+          npm run build -- --base-href /Blogapp/
+          cp dist/blog-frontend/browser/index.html dist/blog-frontend/browser/404.html
         working-directory: ./blog-frontend
 
       - name: Deploy to GitHub Pages

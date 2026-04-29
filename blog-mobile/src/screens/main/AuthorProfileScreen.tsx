@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { getImageUrl } from '../../utils/imageUtils';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import api, { API_BASE_URL } from '../../services/api';
 import BlogCard from '../../components/BlogCard';
@@ -52,25 +53,11 @@ const AuthorProfileScreen = ({ route, navigation }: any) => {
     fetchAuthorBlogs();
   };
 
-  const getProfileImage = (url?: string) => {
-    if (!url) return null;
-    
-    let finalUrl = url;
-    if (url.includes('localhost') || url.includes('127.0.0.1')) {
-      finalUrl = url.replace('localhost', '192.168.1.4').replace('127.0.0.1', '192.168.1.4');
-    }
-
-    if (finalUrl.startsWith('http')) return finalUrl;
-    
-    const cleanPath = finalUrl.replace(/\\/g, '/').startsWith('/') ? finalUrl.substring(1) : finalUrl;
-    return `${API_BASE_URL}/${cleanPath}`;
-  };
-
   const renderHeader = () => (
     <View className="px-8 pt-6 pb-10 items-center border-b border-border/30 mb-8">
       <View className="w-24 h-24 rounded-full bg-accent/10 items-center justify-center overflow-hidden border-2 border-accent/20 mb-6">
         {authorInfo?.avatarUrl ? (
-          <Image source={{ uri: getProfileImage(authorInfo.avatarUrl) || '' }} className="w-full h-full" />
+          <Image source={{ uri: getImageUrl(authorInfo.avatarUrl) || '' }} className="w-full h-full" />
         ) : (
           <Text className="text-accent text-3xl font-serif">{(authorName || 'U').charAt(0)}</Text>
         )}

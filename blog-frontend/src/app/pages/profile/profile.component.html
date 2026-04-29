@@ -7,7 +7,7 @@
     <!-- Header / Identity -->
     <header class="profile-identity-section">
         <div class="identity-photo-container" [class.clickable-photo]="isOwnProfile">
-            <img [src]="user.avatarUrl || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'"
+            <img [src]="(user.avatarUrl | imageUrl) || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'"
                 [alt]="user.fullName" class="identity-photo">
 
             <div class="photo-upload-overlay" *ngIf="isOwnProfile" (click)="avatarInput.click()">

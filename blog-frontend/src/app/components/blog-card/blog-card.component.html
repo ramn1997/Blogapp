@@ -1,7 +1,7 @@
 <article class="editorial-card" [class.featured]="featured">
     <!-- Image -->
     <a [routerLink]="['/blog', blog.id]" class="card-image-wrap">
-        <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl" [alt]="blog.title" class="card-image">
+        <img *ngIf="blog.coverImageUrl" [src]="blog.coverImageUrl | imageUrl" [alt]="blog.title" class="card-image">
         <div *ngIf="!blog.coverImageUrl" class="card-image-placeholder">
             <span class="material-icons" style="font-size: 2.5rem; opacity: 0.3;">auto_stories</span>
         </div>
@@ -34,7 +34,7 @@
                 <a class="author-avatar-wrap" [routerLink]="['/profile']" [queryParams]="{userId: blog.author.id}" (click)="$event.stopPropagation()">
                     <div class="avatar-stack">
                         <span class="material-icons author-fallback-icon">account_circle</span>
-                        <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl" [alt]="blog.author.fullName" 
+                        <img *ngIf="blog.author.avatarUrl" [src]="blog.author.avatarUrl | imageUrl" [alt]="blog.author.fullName" 
                             class="author-mini-photo" loading="eager">
                     </div>
                 </a>

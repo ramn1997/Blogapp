@@ -7,6 +7,9 @@ import SaveLoginPopup from '../../components/SaveLoginPopup';
 import { signInWithGoogle, configureGoogleSignin } from '../../services/googleAuth';
 import GoogleIcon from '../../components/GoogleIcon';
 
+import { signInWithMicrosoft } from '../../services/microsoftAuth';
+import MicrosoftIcon from '../../components/MicrosoftIcon';
+
 const RegisterScreen = ({ navigation }: any) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -32,6 +35,18 @@ const RegisterScreen = ({ navigation }: any) => {
       if (err.code !== 'ASYNC_OP_IN_PROGRESS') {
         Alert.alert('Google Sign-In Error', err.message || 'Failed to sign in with Google');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMicrosoftSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInWithMicrosoft();
+      setShowSavePopup(true);
+    } catch (err: any) {
+      Alert.alert('Microsoft Sign-In Error', err.message || 'Failed to sign in with Microsoft');
     } finally {
       setLoading(false);
     }
@@ -133,20 +148,37 @@ const RegisterScreen = ({ navigation }: any) => {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          className="bg-card border border-border py-4 flex-row justify-center items-center rounded-sm"
-          onPress={handleGoogleSignIn}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#22c55e" />
-          ) : (
-            <>
-              <GoogleIcon size={18} />
-              <Text className="text-text-primary font-bold tracking-widest uppercase text-[12px] ml-3">Google</Text>
-            </>
-          )}
-        </TouchableOpacity>
+        <View className="flex-row justify-between space-x-4">
+          <TouchableOpacity 
+            className="flex-1 bg-card border border-border py-4 flex-row justify-center items-center rounded-sm"
+            onPress={handleGoogleSignIn}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#22c55e" />
+            ) : (
+              <>
+                <GoogleIcon size={18} />
+                <Text className="text-text-primary font-bold tracking-widest uppercase text-[12px] ml-3">Google</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            className="flex-1 bg-card border border-border py-4 flex-row justify-center items-center rounded-sm"
+            onPress={handleMicrosoftSignIn}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#00a4ef" />
+            ) : (
+              <>
+                <MicrosoftIcon size={18} />
+                <Text className="text-text-primary font-bold tracking-widest uppercase text-[12px] ml-3">Microsoft</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
 
 
 
