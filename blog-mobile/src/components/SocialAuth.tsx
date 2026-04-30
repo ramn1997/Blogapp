@@ -18,25 +18,25 @@ const SocialAuth = ({ onGooglePress, onMicrosoftPress, disabled }: SocialAuthPro
         <View className="flex-1 h-[1px] bg-border" />
       </View>
 
-      <View className="flex-row justify-between space-x-4">
+      <View className="flex-row justify-between space-x-3">
         <TouchableOpacity 
-          className={`flex-1 flex-row items-center justify-center bg-card border border-border py-4 rounded-sm ${disabled ? 'opacity-50' : ''}`}
+          className={`flex-1 flex-row items-center justify-center bg-card border border-border/50 py-4 rounded-full shadow-sm ${disabled ? 'opacity-50' : ''}`}
           activeOpacity={0.7}
           onPress={onGooglePress}
           disabled={disabled}
         >
-          <GoogleIcon size={18} />
-          <Text className="text-text-primary ml-3 font-bold uppercase tracking-widest text-[10px]">Google</Text>
+          <GoogleIcon size={20} />
+          <Text className="text-text-primary ml-2 font-semibold text-[15px]">Google</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          className={`flex-1 flex-row items-center justify-center bg-card border border-border py-4 rounded-sm ${disabled ? 'opacity-50' : ''}`}
+          className={`flex-1 flex-row items-center justify-center bg-card border border-border/50 py-4 rounded-full shadow-sm ${disabled ? 'opacity-50' : ''}`}
           activeOpacity={0.7}
           onPress={onMicrosoftPress}
           disabled={disabled}
         >
-          <MicrosoftIcon size={18} />
-          <Text className="text-text-primary ml-3 font-bold uppercase tracking-widest text-[10px]">Microsoft</Text>
+          <MicrosoftIcon size={20} />
+          <Text className="text-text-primary ml-2 font-semibold text-[15px]">Microsoft</Text>
         </TouchableOpacity>
       </View>
     </View>

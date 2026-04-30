@@ -6,6 +6,7 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import SaveLoginPopup from '../../components/SaveLoginPopup';
 import { signInWithGoogle, configureGoogleSignin } from '../../services/googleAuth';
 import { signInWithMicrosoft } from '../../services/microsoftAuth';
+import GoogleIcon from '../../components/GoogleIcon';
 import MicrosoftIcon from '../../components/MicrosoftIcon';
 
 const LoginScreen = ({ navigation }: any) => {
@@ -122,20 +123,21 @@ const LoginScreen = ({ navigation }: any) => {
         </View>
 
         <TouchableOpacity 
-          className="bg-accent py-4 flex-row justify-center items-center rounded-sm shadow-sm"
+          className="bg-accent py-4 flex-row justify-center items-center rounded-full shadow-sm"
           onPress={handleLogin}
           disabled={loading}
+          activeOpacity={0.8}
         >
           {loading ? (
             <ActivityIndicator color="#111" />
           ) : (
-            <Text className="text-primary font-bold tracking-widest uppercase text-[12px]">Sign In</Text>
+            <Text className="text-primary font-bold text-[15px]">Sign In</Text>
           )}
         </TouchableOpacity>
 
-        <View className="flex-row justify-between space-x-4">
+        <View className="flex-row justify-between space-x-3 mt-2">
           <TouchableOpacity 
-            className="flex-1 bg-card border border-border py-4 flex-row justify-center items-center rounded-sm"
+            className="flex-1 bg-card border border-border/50 py-4 flex-row justify-center items-center rounded-full shadow-sm"
             onPress={handleGoogleSignIn}
             disabled={loading}
           >
@@ -143,14 +145,14 @@ const LoginScreen = ({ navigation }: any) => {
               <ActivityIndicator color="#22c55e" />
             ) : (
               <>
-                <GoogleIcon size={18} />
-                <Text className="text-text-primary font-bold tracking-widest uppercase text-[12px] ml-3">Google</Text>
+                <GoogleIcon size={20} />
+                <Text className="text-text-primary font-semibold text-[15px] ml-2">Google</Text>
               </>
             )}
           </TouchableOpacity>
 
           <TouchableOpacity 
-            className="flex-1 bg-card border border-border py-4 flex-row justify-center items-center rounded-sm"
+            className="flex-1 bg-card border border-border/50 py-4 flex-row justify-center items-center rounded-full shadow-sm"
             onPress={handleMicrosoftSignIn}
             disabled={loading}
           >
@@ -158,8 +160,8 @@ const LoginScreen = ({ navigation }: any) => {
               <ActivityIndicator color="#00a4ef" />
             ) : (
               <>
-                <MicrosoftIcon size={18} />
-                <Text className="text-text-primary font-bold tracking-widest uppercase text-[12px] ml-3">Microsoft</Text>
+                <MicrosoftIcon size={20} />
+                <Text className="text-text-primary font-semibold text-[15px] ml-2">Microsoft</Text>
               </>
             )}
           </TouchableOpacity>

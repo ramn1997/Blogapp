@@ -28,12 +28,14 @@ export const signInWithMicrosoft = async () => {
       redirectUri,
       responseType: AuthSession.ResponseType.IdToken,
       prompt: AuthSession.Prompt.SelectAccount,
+      usePKCE: false, // Must be false for Implicit Flow (IdToken)
       extraParams: {
         nonce: Math.random().toString(36).substring(2, 15)
       }
     });
 
     const result = await request.promptAsync(discovery);
+    console.log('[Microsoft Auth] Result:', JSON.stringify(result, null, 2));
 
     if (result.type === 'success' && result.params.id_token) {
       const idToken = result.params.id_token;
@@ -53,7 +55,8 @@ export const signInWithMicrosoft = async () => {
 
       return user;
     } else if (result.type !== 'cancel') {
-      throw new Error('Microsoft authentication failed or was cancelled.');
+      console.error('[Microsoft Auth] Missing id_token or failed. Result:', result);
+      throw new Error(`Microsoft auth failed. Type: ${result.type}`);
     }
   } catch (error: any) {
     console.error('Microsoft Sign-In Error:', error);

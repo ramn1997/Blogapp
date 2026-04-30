@@ -72,10 +72,9 @@ const MainTabs = () => {
           headerRight: () => !isAuthenticated ? (
             <TouchableOpacity 
               onPress={() => navigation.navigate('Login')}
-              className="mr-5 px-4 py-1.5 bg-accent rounded-sm"
-              activeOpacity={0.7}
+              className="mr-5 px-5 py-2 bg-accent rounded-full shadow-sm"
             >
-              <Text className="text-[#111] text-[10px] font-bold uppercase tracking-widest">Login</Text>
+              <Text className="text-primary font-bold text-[13px]">Write</Text>
             </TouchableOpacity>
           ) : null
         })}

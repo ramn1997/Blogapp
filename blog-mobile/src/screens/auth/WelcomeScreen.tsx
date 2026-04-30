@@ -7,7 +7,8 @@ import { useAuthStore } from '../../store/authStore';
 import { signInWithGoogle, configureGoogleSignin } from '../../services/googleAuth';
 import { useEffect } from 'react';
 import GoogleIcon from '../../components/GoogleIcon';
-
+import { signInWithMicrosoft } from '../../services/microsoftAuth';
+import MicrosoftIcon from '../../components/MicrosoftIcon';
 const { width, height } = Dimensions.get('window');
 
 const WelcomeScreen = () => {
@@ -28,6 +29,18 @@ const WelcomeScreen = () => {
       if (err.code !== 'ASYNC_OP_IN_PROGRESS') {
         Alert.alert('Google Sign-In Error', err.message || 'Failed to sign in with Google');
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMicrosoftSignIn = async () => {
+    setLoading(true);
+    try {
+      await signInWithMicrosoft();
+      navigation.navigate('Main');
+    } catch (err: any) {
+      Alert.alert('Microsoft Sign-In Error', err.message || 'Failed to sign in with Microsoft');
     } finally {
       setLoading(false);
     }
@@ -63,23 +76,38 @@ const WelcomeScreen = () => {
         <View className="space-y-4">
           <TouchableOpacity 
             onPress={() => navigation.navigate('Login')}
-            className="bg-accent py-5 rounded-sm flex-row justify-center items-center overflow-hidden"
-            activeOpacity={0.9}
+            className="bg-accent py-4 rounded-full flex-row justify-center items-center shadow-sm"
+            activeOpacity={0.8}
           >
-            <Text className="text-primary font-bold uppercase tracking-[2px] text-[12px]">Sign In to Account</Text>
+            <Text className="text-primary font-bold text-[15px]">Sign In to Account</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
             onPress={handleGoogleSignIn}
             disabled={loading}
-            className="bg-card border border-border py-5 rounded-sm flex-row justify-center items-center"
+            className="bg-card border border-border/50 py-4 rounded-full flex-row justify-center items-center mt-2 shadow-sm"
           >
             {loading ? (
               <ActivityIndicator color="#22c55e" />
             ) : (
               <>
-                <GoogleIcon size={18} />
-                <Text className="text-text-primary font-bold uppercase tracking-[2px] text-[12px] ml-3">Continue with Google</Text>
+                <GoogleIcon size={20} />
+                <Text className="text-text-primary font-semibold text-[15px] ml-3">Continue with Google</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={handleMicrosoftSignIn}
+            disabled={loading}
+            className="bg-card border border-border/50 py-4 rounded-full flex-row justify-center items-center mt-3 shadow-sm"
+          >
+            {loading ? (
+              <ActivityIndicator color="#00a4ef" />
+            ) : (
+              <>
+                <MicrosoftIcon size={20} />
+                <Text className="text-text-primary font-semibold text-[15px] ml-3">Continue with Microsoft</Text>
               </>
             )}
           </TouchableOpacity>

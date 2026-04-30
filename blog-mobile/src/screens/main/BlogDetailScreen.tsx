@@ -226,9 +226,9 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
                 <TouchableOpacity 
                   key={index} 
                   onPress={() => navigation.navigate('Main', { screen: 'Explore', params: { search: tag } })}
-                  className="bg-card border border-border px-4 py-1.5 rounded-full mr-3 mb-3"
+                  className="bg-card border border-border/50 px-4 py-1.5 rounded-full mr-3 mb-3 shadow-sm"
                 >
-                  <Text className="text-accent text-[11px] font-bold uppercase tracking-widest">#{tag}</Text>
+                  <Text className="text-text-secondary text-[13px] font-medium">#{tag}</Text>
                 </TouchableOpacity>
               ));
             })()}
@@ -272,12 +272,12 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
                 <TouchableOpacity 
                   onPress={postComment}
                   disabled={submittingComment}
-                  className="bg-accent px-8 py-2.5 rounded-sm"
+                  className="bg-accent px-8 py-3 rounded-full shadow-sm"
                 >
                   {submittingComment ? (
                     <ActivityIndicator size="small" color="#111" />
                   ) : (
-                    <Text className="text-[#111] font-bold uppercase text-[11px] tracking-widest">Post</Text>
+                    <Text className="text-primary font-bold text-[14px]">Post</Text>
                   )}
                 </TouchableOpacity>
               </View>

@@ -97,10 +97,10 @@ const NotificationScreen = ({ navigation }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Stay Connected</Text>
         <Text className="text-text-secondary text-center mb-10 px-8">Sign in to receive updates on your stories and community interactions.</Text>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Login')}
-          className="bg-accent px-10 py-4 w-full items-center rounded-sm"
+          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+          className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
         >
-          <Text className="text-primary font-bold uppercase tracking-widest text-xs">Sign In</Text>
+          <Text className="text-primary font-bold text-[15px]">Sign In</Text>
         </TouchableOpacity>
       </View>
     );

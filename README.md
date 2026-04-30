@@ -31,6 +31,11 @@ BlogApp/
 │   │   ├── interceptors/ # JWT HTTP interceptor
 │   │   └── models/       # TypeScript interfaces
 │   └── src/environments/ # Dev/prod config
+├── blog-mobile/          # React Native Mobile App (Expo)
+│   ├── src/              # Screens, services, components
+│   ├── assets/           # App icons and fonts
+│   ├── app.json          # Expo configuration (Scribeflow)
+│   └── package.json      # Dependencies
 ├── .github/workflows/    # GitHub Actions CI/CD
 └── docker-compose.yml    # API + SQL Server stack
 ```

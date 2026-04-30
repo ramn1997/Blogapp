@@ -114,12 +114,12 @@ const DashboardScreen = ({ navigation }: any) => {
         <LayoutDashboard size={64} color="#333" />
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Personal Library</Text>
         <Text className="text-text-secondary text-center mb-10">Sign in to see your published stories and saved collections.</Text>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Login')}
-          className="bg-accent px-10 py-4 w-full items-center rounded-sm"
-        >
-          <Text className="text-primary font-bold uppercase tracking-widest">Sign In to View</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+            className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
+          >
+            <Text className="text-primary font-bold text-[15px]">Sign In to View Dashboard</Text>
+          </TouchableOpacity>
       </View>
     );
   }

@@ -186,15 +186,15 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog: initialBlog, onEdit, onDelete
         {(onEdit || onDelete) && (
           <View className="flex-row justify-end mt-6 border-t border-border/30 pt-5">
             {onEdit && (
-              <TouchableOpacity onPress={onEdit} className="mr-6 flex-row items-center px-4 py-2 bg-accent/5 border border-accent/10 rounded-sm">
-                <Edit2 size={12} color="#22c55e" />
-                <Text className="text-accent text-[10px] uppercase tracking-widest ml-2 font-bold">Edit</Text>
+              <TouchableOpacity onPress={onEdit} className="mr-4 flex-row items-center px-4 py-2 bg-accent/10 border border-accent/20 rounded-full">
+                <Edit2 size={14} color="#22c55e" />
+                <Text className="text-accent text-[12px] font-semibold ml-2">Edit</Text>
               </TouchableOpacity>
             )}
             {onDelete && (
-              <TouchableOpacity onPress={() => onDelete(blog.id)} className="flex-row items-center px-4 py-2 bg-danger/5 border border-danger/10 rounded-sm">
-                <Trash2 size={12} color="#ef4444" />
-                <Text className="text-danger text-[10px] uppercase tracking-widest ml-2 font-bold">Delete</Text>
+              <TouchableOpacity onPress={() => onDelete(blog.id)} className="flex-row items-center px-4 py-2 bg-danger/10 border border-danger/20 rounded-full">
+                <Trash2 size={14} color="#ef4444" />
+                <Text className="text-danger text-[12px] font-semibold ml-2">Delete</Text>
               </TouchableOpacity>
             )}
           </View>

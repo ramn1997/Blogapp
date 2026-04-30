@@ -168,10 +168,10 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Share Your Voice</Text>
         <Text className="text-text-secondary text-center mb-10 px-4">Sign in to publish stories to the community.</Text>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Login')}
-          className="bg-accent px-10 py-4 w-full items-center rounded-sm"
+          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+          className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
         >
-          <Text className="text-primary font-bold uppercase tracking-widest text-xs">Sign In</Text>
+          <Text className="text-primary font-bold text-[15px]">Sign In to Write</Text>
         </TouchableOpacity>
       </View>
     );
@@ -237,9 +237,9 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
                   <TouchableOpacity
                     key={cat}
                     onPress={() => setCategory(cat)}
-                    className={`mr-3 px-5 py-2.5 border rounded-sm ${category === cat ? 'bg-accent border-accent' : 'border-border'}`}
+                    className={`mr-3 px-5 py-2.5 border rounded-full ${category === cat ? 'bg-accent border-accent' : 'border-border/50'}`}
                   >
-                    <Text className={`text-[10px] font-bold uppercase tracking-widest ${category === cat ? 'text-primary' : 'text-text-secondary'}`}>
+                    <Text className={`font-medium text-[13px] ${category === cat ? 'text-primary' : 'text-text-secondary'}`}>
                       {cat}
                     </Text>
                   </TouchableOpacity>
@@ -275,15 +275,15 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
               <TouchableOpacity 
                 onPress={() => handleSave(false)}
                 disabled={loading}
-                className="flex-1 bg-card border border-border py-5 items-center justify-center rounded-sm"
+                className="flex-1 bg-card border border-border/50 py-4 items-center justify-center rounded-full shadow-sm"
               >
-                <Text className="text-text-primary font-bold uppercase tracking-widest text-[10px]">Save Draft</Text>
+                <Text className="text-text-primary font-semibold text-[15px]">Save Draft</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
                 onPress={() => handleSave(true)}
                 disabled={loading}
-                className="flex-1 bg-accent py-5 items-center justify-center rounded-sm shadow-lg shadow-accent/20"
+                className="flex-1 bg-accent py-4 items-center justify-center rounded-full shadow-sm"
               >
                 {loading ? (
                   <ActivityIndicator color="#111" />

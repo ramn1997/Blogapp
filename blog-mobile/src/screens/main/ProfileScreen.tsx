@@ -131,10 +131,10 @@ const ProfileScreen = ({ navigation }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Guest Explorer</Text>
         <Text className="text-text-secondary text-center mb-10">Sign in to share your own stories and manage your profile.</Text>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Login')}
-          className="bg-accent px-10 py-4 w-full items-center rounded-sm"
+          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+          className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
         >
-          <Text className="text-primary font-bold uppercase tracking-widest">Sign In</Text>
+          <Text className="text-primary font-bold text-[15px]">Sign In</Text>
         </TouchableOpacity>
       </View>
     );
@@ -206,7 +206,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
           <TouchableOpacity 
             onPress={handleUpdate}
-            className="bg-accent py-5 rounded-sm items-center shadow-md shadow-accent/20"
+            className="bg-accent py-5 rounded-full items-center shadow-md shadow-accent/20"
             disabled={loading}
           >
             {loading ? <ActivityIndicator color="#111" /> : <Text className="text-primary font-bold uppercase tracking-widest text-[12px]">Save Changes</Text>}
@@ -214,7 +214,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
           <TouchableOpacity 
             onPress={() => logout()}
-            className="bg-card py-5 rounded-sm items-center border border-border mt-4"
+            className="bg-card py-5 rounded-full items-center border border-border mt-4"
           >
             <Text className="text-danger font-bold uppercase tracking-widest text-[12px]">Sign Out</Text>
           </TouchableOpacity>
