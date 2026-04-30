@@ -13,7 +13,7 @@ export const API_BASE_URL = __DEV__ ? DEV_API : PROD_API;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000, // Add timeout to help debug connection issues
+  timeout: 15000, // Increased for production stability (handling cold starts)
   headers: {
     'Content-Type': 'application/json',
   },

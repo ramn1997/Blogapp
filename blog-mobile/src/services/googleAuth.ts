@@ -11,12 +11,19 @@ export const configureGoogleSignin = () => {
 
 export const signInWithGoogle = async () => {
   try {
+    console.log('[Google Auth] Starting sign-in...');
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
+    console.log('[Google Auth] User info received:', userInfo.data?.user.email);
+
     const idToken = userInfo.data?.idToken;
 
-    if (!idToken) throw new Error('No ID Token found');
+    if (!idToken) {
+      console.error('[Google Auth] No ID Token found');
+      throw new Error('No ID Token found from Google');
+    }
 
+    console.log('[Google Auth] Sending token to backend...');
     // Send the token and user info to your backend
     const response = await api.post('/api/auth/oauth', {
       provider: 'google',
@@ -28,6 +35,7 @@ export const signInWithGoogle = async () => {
     });
     
     const { user, token } = response.data;
+    console.log('[Google Auth] Backend success for user:', user.email);
 
     // Use your auth store to set the user and token
     const login = useAuthStore.getState().login;
@@ -35,7 +43,7 @@ export const signInWithGoogle = async () => {
 
     return user;
   } catch (error: any) {
-    console.error('Google Sign-In Error:', error);
+    console.error('Google Sign-In Error:', JSON.stringify(error, null, 2));
     throw error;
   }
 };

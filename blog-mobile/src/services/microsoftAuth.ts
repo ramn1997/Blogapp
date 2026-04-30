@@ -21,6 +21,7 @@ export const signInWithMicrosoft = async () => {
       scheme: 'scribeflow',
       path: 'auth'
     });
+    console.log('[Microsoft Auth] Redirect URI:', redirectUri);
 
     const request = new AuthSession.AuthRequest({
       clientId: CLIENT_ID,
@@ -28,35 +29,38 @@ export const signInWithMicrosoft = async () => {
       redirectUri,
       responseType: AuthSession.ResponseType.IdToken,
       prompt: AuthSession.Prompt.SelectAccount,
-      usePKCE: false, // Must be false for Implicit Flow (IdToken)
+      usePKCE: false, 
       extraParams: {
         nonce: Math.random().toString(36).substring(2, 15)
       }
     });
 
+    console.log('[Microsoft Auth] Prompting user...');
     const result = await request.promptAsync(discovery);
     console.log('[Microsoft Auth] Result:', JSON.stringify(result, null, 2));
 
     if (result.type === 'success' && result.params.id_token) {
       const idToken = result.params.id_token;
+      console.log('[Microsoft Auth] Sending id_token to backend...');
 
-      // The mobile token from MS doesn't decode perfectly in frontend without jwt-decode
-      // But our backend extracts the email and providerId during validation
       const response = await api.post('/api/auth/oauth', {
         provider: 'microsoft',
         idToken: idToken
       });
       
       const { user, token } = response.data;
+      console.log('[Microsoft Auth] Backend success for user:', user.email);
 
-      // Use auth store to set the user and token
       const login = useAuthStore.getState().login;
       await login(user, token);
 
       return user;
-    } else if (result.type !== 'cancel') {
-      console.error('[Microsoft Auth] Missing id_token or failed. Result:', result);
-      throw new Error(`Microsoft auth failed. Type: ${result.type}`);
+    } else if (result.type === 'cancel') {
+      console.log('[Microsoft Auth] User cancelled login');
+      return null;
+    } else {
+      console.error('[Microsoft Auth] Failure. Type:', result.type, 'Error:', (result as any).error);
+      throw new Error(`Microsoft auth failed: ${(result as any).error || result.type}`);
     }
   } catch (error: any) {
     console.error('Microsoft Sign-In Error:', error);

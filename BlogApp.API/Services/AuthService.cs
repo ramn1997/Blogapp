@@ -135,8 +135,69 @@ namespace BlogApp.API.Services
             {
                 return await ValidateMicrosoftLoginAsync(dto);
             }
+            
+            if (dto.Provider is "google")
+            {
+                return await ValidateGoogleLoginAsync(dto);
+            }
 
             return dto;
+        }
+
+        private async Task<OAuthLoginDto> ValidateGoogleLoginAsync(OAuthLoginDto dto)
+        {
+            var clientId = _configuration["Authentication:Google:ClientId"];
+            
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw new InvalidOperationException("Google authentication is not configured on the server.");
+            }
+
+            var authority = "https://accounts.google.com";
+            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                $"{authority}/.well-known/openid-configuration",
+                new OpenIdConnectConfigurationRetriever());
+
+            var openIdConfig = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+            
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = authority,
+                ValidateAudience = true,
+                ValidAudience = clientId,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = openIdConfig.SigningKeys
+            };
+
+            try 
+            {
+                var principal = new JwtSecurityTokenHandler()
+                    .ValidateToken(dto.IdToken, validationParameters, out _);
+
+                var providerId = principal.FindFirstValue(ClaimTypes.NameIdentifier) 
+                    ?? principal.FindFirstValue("sub")
+                    ?? throw new SecurityTokenValidationException("Google token does not include a user id.");
+
+                var email = principal.FindFirstValue(ClaimTypes.Email) 
+                    ?? principal.FindFirstValue("email")
+                    ?? throw new SecurityTokenValidationException("Google token does not include an email address.");
+
+                return new OAuthLoginDto
+                {
+                    Provider = "google",
+                    IdToken = dto.IdToken,
+                    Email = email,
+                    FullName = principal.FindFirstValue("name") ?? principal.FindFirstValue(ClaimTypes.Name) ?? dto.FullName ?? email,
+                    AvatarUrl = principal.FindFirstValue("picture") ?? dto.AvatarUrl,
+                    ProviderId = providerId
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new SecurityTokenValidationException($"Google token validation failed: {ex.Message}", ex);
+            }
         }
 
         private async Task<OAuthLoginDto> ValidateMicrosoftLoginAsync(OAuthLoginDto dto)
