@@ -11,13 +11,11 @@ export const getImageUrl = (url?: string | null): string => {
     return 'https://via.placeholder.com/600x300?text=Scribeflow';
   }
 
-  // If it's already a correct URL (e.g., data URL or already points to our current API)
-  if (url.startsWith('data:') || url.startsWith(API_BASE_URL)) {
-    return url;
-  }
+  // 1. Normalize backslashes to forward slashes (common in .NET paths)
+  let normalizedUrl = url.replace(/\\/g, '/');
 
-  // Handle absolute URLs that point to stale backend hosts (IPs, localhost, etc)
-  const apiHostMatch = url.match(/^https?:\/\/[^\/]+/);
+  // 2. Handle absolute URLs and stale IP addresses
+  const apiHostMatch = normalizedUrl.match(/^https?:\/\/[^\/]+/);
   if (apiHostMatch) {
     const urlHost = apiHostMatch[0];
     const currentApiHost = API_BASE_URL.replace(/\/$/, '');
@@ -28,20 +26,17 @@ export const getImageUrl = (url?: string | null): string => {
                         urlHost.includes('192.168.') ||
                         urlHost.includes('azurewebsites.net');
                         
-    if (isStaleHost) {
-      return url.replace(urlHost, currentApiHost);
+    if (isStaleHost && urlHost !== currentApiHost) {
+      normalizedUrl = normalizedUrl.replace(urlHost, currentApiHost);
     }
   }
 
-  // Handle relative paths (e.g., /uploads/xyz.png)
-  if (url.startsWith('/')) {
-    return `${API_BASE_URL}${url}`;
+  // 3. If it's already a full URL now, return it
+  if (normalizedUrl.startsWith('http') || normalizedUrl.startsWith('data:')) {
+    return normalizedUrl;
   }
 
-  // If it's a relative path without leading slash, add one
-  if (!url.startsWith('http')) {
-    return `${API_BASE_URL}/${url}`;
-  }
-
-  return url;
+  // 4. Handle relative paths (e.g., /uploads/xyz.png or uploads/xyz.png)
+  const cleanPath = normalizedUrl.startsWith('/') ? normalizedUrl.substring(1) : normalizedUrl;
+  return `${API_BASE_URL}/${cleanPath}`;
 };

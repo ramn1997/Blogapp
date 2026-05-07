@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import { getImageUrl } from '../../utils/imageUtils';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import api, { API_BASE_URL } from '../../services/api';
@@ -95,7 +96,7 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [16, 9],
       quality: 0.8,
@@ -123,17 +124,16 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
         coverImageUrl = uploadRes.data.url;
       }
 
-      // FIXED PAYLOAD: Wrapping in 'dto' and keeping 'tags' as a string to match backend expectations.
+      // REMOVED 'dto' WRAPPER: Backend expects the object directly from Body.
+      // SUMMARY: If empty, let backend generate from content (send undefined to omit from JSON).
       const payload = {
-        dto: {
-          title: title.trim(),
-          summary: summary.trim() || title.substring(0, 100).trim(),
-          content,
-          category,
-          coverImageUrl,
-          isPublished,
-          tags: tags // Backend expects System.String, sending comma-separated string
-        }
+        title: title.trim(),
+        summary: summary.trim() || undefined,
+        content,
+        category,
+        coverImageUrl,
+        isPublished,
+        tags: tags // Backend expects System.String (comma separated)
       };
 
       if (editId) {
@@ -145,7 +145,12 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
       }
     } catch (error: any) {
       console.error('Save failed details:', error.response?.data || error.message);
-      const serverMsg = error.response?.data?.title || error.response?.data?.message || 'The server encountered an issue processing your request.';
+      // Enhanced error message extraction
+      let serverMsg = 'The server encountered an issue processing your request.';
+      if (error.response?.data) {
+        const data = error.response.data;
+        serverMsg = data.message || data.title || (data.errors ? Object.values(data.errors).flat().join(' ') : serverMsg);
+      }
       showFeedback('error', 'Publication Failed', serverMsg);
     } finally {
       if (isMounted.current) setLoading(false);
@@ -168,7 +173,7 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Share Your Voice</Text>
         <Text className="text-text-secondary text-center mb-10 px-4">Sign in to publish stories to the community.</Text>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+          onPress={() => navigation.navigate('Login')}
           className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
         >
           <Text className="text-primary font-bold text-[15px]">Sign In to Write</Text>
@@ -196,7 +201,7 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
             {image ? (
               <Image source={{ uri: image.uri }} className="w-full h-full" />
             ) : existingImageUrl ? (
-              <Image source={{ uri: existingImageUrl.startsWith('http') ? existingImageUrl : `${API_BASE_URL}${existingImageUrl.startsWith('/') ? '' : '/'}${existingImageUrl}` }} className="w-full h-full" />
+              <Image source={{ uri: getImageUrl(existingImageUrl) }} className="w-full h-full" />
             ) : (
               <>
                 <Camera size={32} className="text-text-muted opacity-50" />

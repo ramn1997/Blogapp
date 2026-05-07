@@ -5,20 +5,14 @@ import BlogCard from '../../components/BlogCard';
 import { Search, ArrowLeft, X, Filter } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 
-const SearchScreen = ({ navigation }: any) => {
+const SearchScreen = ({ navigation, route }: any) => {
   const { colorScheme } = useColorScheme();
-  const [query, setQuery] = useState('');
+  const initialQuery = route.params?.query || '';
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const inputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    // Focus search bar on entry
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
-  }, []);
 
   const handleSearch = useCallback(async (text: string) => {
     if (!text.trim()) {
@@ -40,6 +34,17 @@ const SearchScreen = ({ navigation }: any) => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (initialQuery) {
+      handleSearch(initialQuery);
+    } else {
+      // Focus search bar on entry only if not performing an initial search
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [initialQuery, handleSearch]);
 
   // Debounced search would be better, but let's do a simple trigger on submit for now
   // or use a timeout

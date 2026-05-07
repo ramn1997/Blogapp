@@ -225,7 +225,7 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
               return tagsArray.map((tag, index) => (
                 <TouchableOpacity 
                   key={index} 
-                  onPress={() => navigation.navigate('Main', { screen: 'Explore', params: { search: tag } })}
+                  onPress={() => navigation.navigate('Search', { query: tag })}
                   className="bg-card border border-border/50 px-4 py-1.5 rounded-full mr-3 mb-3 shadow-sm"
                 >
                   <Text className="text-text-secondary text-[13px] font-medium">#{tag}</Text>

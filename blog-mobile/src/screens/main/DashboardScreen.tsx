@@ -49,7 +49,7 @@ const DashboardScreen = ({ navigation }: any) => {
           total: myRes.data.totalCount || 0,
           published: allMyBlogs.filter((b: any) => b.isPublished).length,
           drafts: allMyBlogs.filter((b: any) => !b.isPublished).length,
-          likes: allMyBlogs.reduce((acc: number, b: any) => acc + (b.likesCount || 0), 0),
+          likes: allMyBlogs.reduce((acc: number, b: any) => acc + (b.likeCount || 0), 0),
           views: allMyBlogs.reduce((acc: number, b: any) => acc + (b.viewCount || 0), 0)
         });
       }
@@ -115,7 +115,7 @@ const DashboardScreen = ({ navigation }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Personal Library</Text>
         <Text className="text-text-secondary text-center mb-10">Sign in to see your published stories and saved collections.</Text>
           <TouchableOpacity 
-            onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+            onPress={() => navigation.navigate('Login')}
             className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
           >
             <Text className="text-primary font-bold text-[15px]">Sign In to View Dashboard</Text>

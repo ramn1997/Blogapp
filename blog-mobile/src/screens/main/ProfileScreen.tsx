@@ -32,7 +32,7 @@ const ProfileScreen = ({ navigation }: any) => {
         const blogs = res.data.items;
         setStats({
           stories: res.data.totalCount,
-          likes: blogs.reduce((acc: number, b: any) => acc + (b.likesCount || 0), 0)
+          likes: blogs.reduce((acc: number, b: any) => acc + (b.likeCount || 0), 0)
         });
       }
     } catch (err) {
@@ -111,13 +111,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
   const getProfileImage = () => {
     if (user?.avatarUrl) {
-      let url = user.avatarUrl;
-      if (url.includes('localhost') || url.includes('127.0.0.1')) {
-        url = url.replace('localhost', '192.168.1.4').replace('127.0.0.1', '192.168.1.4');
-      }
-      if (url.startsWith('http')) return { uri: url };
-      const cleanPath = url.replace(/\\/g, '/').startsWith('/') ? url.substring(1) : url;
-      return { uri: `${API_BASE_URL}/${cleanPath}` };
+      return { uri: getImageUrl(user.avatarUrl) };
     }
     return null;
   };
@@ -131,7 +125,7 @@ const ProfileScreen = ({ navigation }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Guest Explorer</Text>
         <Text className="text-text-secondary text-center mb-10">Sign in to share your own stories and manage your profile.</Text>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+          onPress={() => navigation.navigate('Login')}
           className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
         >
           <Text className="text-primary font-bold text-[15px]">Sign In</Text>

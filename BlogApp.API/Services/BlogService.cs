@@ -57,6 +57,7 @@ namespace BlogApp.API.Services
                 .Include(b => b.BlogLikes)
                 .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
+                .AsNoTracking()
                 .Where(b => b.IsPublished)
                 .AsQueryable();
 
@@ -108,6 +109,7 @@ namespace BlogApp.API.Services
                 .Include(b => b.BlogLikes)
                 .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Id == id)
                 ?? throw new KeyNotFoundException("Blog not found.");
 
@@ -203,6 +205,7 @@ namespace BlogApp.API.Services
                 .Include(b => b.BlogLikes)
                 .Include(b => b.SavedBlogs)
                 .Include(b => b.Comments)
+                .AsNoTracking()
                 .Where(b => b.UserId == userId);
 
             if (publishedOnly.HasValue)
@@ -280,6 +283,7 @@ namespace BlogApp.API.Services
                 .Include(c => c.Author)
                 .Where(c => c.BlogId == blogId)
                 .OrderBy(c => c.CreatedAt)
+                .AsNoTracking()
                 .ToListAsync();
 
             return comments.Select(MapToComment).ToList();
@@ -338,6 +342,7 @@ namespace BlogApp.API.Services
                 .ThenInclude(b => b.BlogLikes)
                 .Include(sb => sb.Blog)
                 .ThenInclude(b => b.SavedBlogs)
+                .AsNoTracking()
                 .Where(sb => sb.UserId == userId);
 
             var total = await query.CountAsync();

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import api, { API_BASE_URL } from '../../services/api';
 import { Bell, Heart, MessageCircle, User, CheckCircle2, ChevronRight, X } from 'lucide-react-native';
+import { getImageUrl } from '../../utils/imageUtils';
 import { useAuthStore } from '../../store/authStore';
 
 interface AppNotification {
@@ -83,12 +84,7 @@ const NotificationScreen = ({ navigation }: any) => {
     }
   };
 
-  const getActorAvatar = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    const cleanPath = url.replace(/\\/g, '/').startsWith('/') ? url.substring(1) : url;
-    return `${API_BASE_URL}/${cleanPath}`;
-  };
+
 
   if (!user) {
     return (
@@ -97,7 +93,7 @@ const NotificationScreen = ({ navigation }: any) => {
         <Text className="text-text-primary text-xl font-serif mt-6 mb-2">Stay Connected</Text>
         <Text className="text-text-secondary text-center mb-10 px-8">Sign in to receive updates on your stories and community interactions.</Text>
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+          onPress={() => navigation.navigate('Login')}
           className="bg-accent px-10 py-4 w-full items-center rounded-full shadow-sm"
         >
           <Text className="text-primary font-bold text-[15px]">Sign In</Text>
@@ -145,7 +141,7 @@ const NotificationScreen = ({ navigation }: any) => {
             <View className="relative">
               <View className="w-12 h-12 rounded-full bg-secondary items-center justify-center overflow-hidden border border-border/50">
                 {item.actorAvatar ? (
-                  <Image source={{ uri: getActorAvatar(item.actorAvatar) }} className="w-full h-full" />
+                  <Image source={{ uri: getImageUrl(item.actorAvatar) }} className="w-full h-full" />
                 ) : (
                   <Text className="text-text-primary font-serif">{item.actorName?.charAt(0)}</Text>
                 )}
