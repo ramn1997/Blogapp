@@ -37,6 +37,7 @@ export const getImageUrl = (url?: string | null): string => {
   }
 
   // 4. Handle relative paths (e.g., /uploads/xyz.png or uploads/xyz.png)
+  const baseUrl = API_BASE_URL.replace(/\/$/, '');
   const cleanPath = normalizedUrl.startsWith('/') ? normalizedUrl.substring(1) : normalizedUrl;
-  return `${API_BASE_URL}/${cleanPath}`;
+  return `${baseUrl}/${cleanPath}`;
 };

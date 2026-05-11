@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Blog, Comment } from '../../models';
 import { BlogService } from '../../services/blog.service';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -12,6 +14,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class BlogDetailComponent implements OnInit {
   blog: Blog | null = null;
+  sanitizedContent: SafeHtml = '';
   comments: Comment[] = [];
   loading = true;
   commentInput = '';
@@ -22,7 +25,8 @@ export class BlogDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private blogService: BlogService,
-    public authService: AuthService
+    public authService: AuthService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -30,11 +34,24 @@ export class BlogDetailComponent implements OnInit {
     this.blogService.getBlog(id).subscribe({
       next: (blog) => {
         this.blog = blog;
+        this.sanitizedContent = this.getSanitizedContent(blog.content || '');
         this.loading = false;
         this.loadComments(id);
       },
       error: () => { this.loading = false; this.router.navigate(['/']); }
     });
+  }
+
+  private getSanitizedContent(content: string): SafeHtml {
+    if (!content) return '';
+    
+    const baseUrl = environment.apiUrl.replace(/\/$/, '');
+    
+    // Replace relative /uploads/ paths with absolute ones
+    const normalized = content.replace(/src="\/uploads\//g, `src="${baseUrl}/uploads/`)
+                               .replace(/src="uploads\//g, `src="${baseUrl}/uploads/`);
+    
+    return this.sanitizer.bypassSecurityTrustHtml(normalized);
   }
 
   loadComments(id: number): void {

@@ -20,12 +20,10 @@ namespace BlogApp.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadImage([FromForm] IFormFile file)
         {
-            _logger.LogInformation("UploadImage endpoint hit. File is null? {IsNull}", file == null);
+            _logger.LogInformation("UploadImage endpoint hit. File name: {FileName}", file?.FileName);
 
             if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
-
-            _logger.LogInformation("File name: {FileName}, ContentType: {ContentType}, Length: {Length}", file.FileName, file.ContentType, file.Length);
+                return BadRequest("No file uploaded or file is empty.");
 
             var extension = Path.GetExtension(file.FileName)?.ToLowerInvariant();
             
@@ -39,39 +37,38 @@ namespace BlogApp.API.Controllers
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
             {
-                _logger.LogWarning("Invalid or missing extension rejected: {Extension}", extension);
-                return BadRequest($"Invalid file type: {extension ?? "unknown"}");
+                return BadRequest($"Unsupported file type: {extension ?? "unknown"}");
             }
 
+            // Sync with Program.cs path logic
             var isAzure = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
-            var webRoot = isAzure ? "/home/site/wwwroot" : (_environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
-            var uploadsFolder = Path.Combine(webRoot, "uploads");
-            
-            _logger.LogInformation("Saving to folder: {Folder}", uploadsFolder);
+            var uploadBaseUrl = isAzure ? "/home/site/wwwroot" : (_environment.WebRootPath ?? "wwwroot");
+            var uploadsFolder = Path.GetFullPath(Path.Combine(uploadBaseUrl, "uploads"));
             
             try
             {
                 if (!Directory.Exists(uploadsFolder))
+                {
+                    _logger.LogInformation("Creating uploads directory: {Path}", uploadsFolder);
                     Directory.CreateDirectory(uploadsFolder);
+                }
 
                 var fileName = $"{Guid.NewGuid()}{extension}";
                 var filePath = Path.Combine(uploadsFolder, fileName);
 
+                _logger.LogInformation("Saving file to: {Path}", filePath);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
 
-                var relativeUrl = $"/uploads/{fileName}";
-                
-                _logger.LogInformation("Upload successful. Relative URL: {Url}", relativeUrl);
-
-                return Ok(new { url = relativeUrl });
+                // Return relative URL that works with app.UseStaticFiles mapping
+                return Ok(new { url = $"/uploads/{fileName}" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while saving the uploaded file");
-                return StatusCode(500, "Internal server error during upload");
+                _logger.LogError(ex, "Failed to save upload to {Path}", uploadsFolder);
+                return StatusCode(500, new { message = "Failed to save image on server.", details = ex.Message });
             }
         }
     }

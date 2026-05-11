@@ -90,6 +90,22 @@ namespace BlogApp.API.Data
                 .WithMany()
                 .HasForeignKey(n => n.ActorId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Additional Indexes for Performance
+            modelBuilder.Entity<Blog>()
+                .HasIndex(b => b.IsPublished);
+            
+            modelBuilder.Entity<Blog>()
+                .HasIndex(b => b.PublishedAt);
+
+            modelBuilder.Entity<Blog>()
+                .HasIndex(b => b.Category);
+
+            modelBuilder.Entity<Blog>()
+                .HasIndex(b => b.UserId);
+
+            modelBuilder.Entity<Blog>()
+                .HasIndex(b => b.CreatedAt);
         }
     }
 }

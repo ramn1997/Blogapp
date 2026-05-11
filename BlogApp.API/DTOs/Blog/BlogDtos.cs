@@ -43,6 +43,26 @@ namespace BlogApp.API.DTOs.Blog
         public AuthorDto Author { get; set; } = null!;
     }
 
+    public class BlogListItemDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? Summary { get; set; }
+        public string? CoverImageUrl { get; set; }
+        public string? Category { get; set; }
+        public string? Tags { get; set; }
+        public bool IsPublished { get; set; }
+        public int ViewCount { get; set; }
+        public int ReadTimeMinutes { get; set; }
+        public int LikeCount { get; set; }
+        public int CommentCount { get; set; }
+        public bool IsLikedByCurrentUser { get; set; }
+        public bool IsSavedByCurrentUser { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? PublishedAt { get; set; }
+        public AuthorDto Author { get; set; } = null!;
+    }
+
     public class AuthorDto
     {
         public int Id { get; set; }
@@ -52,7 +72,7 @@ namespace BlogApp.API.DTOs.Blog
 
     public class BlogListResponseDto
     {
-        public List<BlogResponseDto> Items { get; set; } = new();
+        public List<BlogListItemDto> Items { get; set; } = new();
         public int TotalCount { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }

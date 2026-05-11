@@ -11,21 +11,24 @@ export class ImageUrlPipe implements PipeTransform {
       return '';
     }
 
-    // If it's a data URL, return as is
-    if (url.startsWith('data:')) {
-      return url;
+    // Normalize backslashes to forward slashes (common in .NET paths)
+    let normalizedUrl = url.replace(/\\/g, '/');
+
+    // 1. If it's a data URL, return as is
+    if (normalizedUrl.startsWith('data:')) {
+      return normalizedUrl;
     }
 
-    // Normalizing absolute URLs from any known API host (local, IP, or production)
-    // We want to redirect these to our current environment.apiUrl
-    const apiHostMatch = url.match(/^https?:\/\/[^\/]+/);
+    // 2. Normalizing absolute URLs from any known API host (local, IP, or production)
+    const apiHostMatch = normalizedUrl.match(/^https?:\/\/[^\/]+/);
+    const currentApiHost = environment.apiUrl.replace(/\/$/, '');
+
     if (apiHostMatch) {
-      const currentApiHost = environment.apiUrl.replace(/\/$/, '');
       const urlHost = apiHostMatch[0];
       
-      // If it's already using the correct host, just ensure protocol matches
+      // If it's already using the correct host, just return it
       if (urlHost === currentApiHost) {
-        return url;
+        return normalizedUrl;
       }
 
       // If it points to any of our known backend patterns, replace it with current apiUrl
@@ -35,15 +38,15 @@ export class ImageUrlPipe implements PipeTransform {
                           urlHost.includes('azurewebsites.net');
                           
       if (isStaleHost) {
-        return url.replace(urlHost, currentApiHost);
+        return normalizedUrl.replace(urlHost, currentApiHost);
       }
+      
+      // If it's a full URL but not one of ours (e.g. placeholder), return as is
+      return normalizedUrl;
     }
 
-    // If it's a relative path (e.g., /uploads/xyz.png), prefix it
-    if (url.startsWith('/')) {
-      return `${environment.apiUrl}${url}`;
-    }
-
-    return url;
+    // 3. Handle relative paths (e.g., /uploads/xyz.png or uploads/xyz.png)
+    const cleanPath = normalizedUrl.startsWith('/') ? normalizedUrl.substring(1) : normalizedUrl;
+    return `${currentApiHost}/${cleanPath}`;
   }
 }

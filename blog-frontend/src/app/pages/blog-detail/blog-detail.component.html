@@ -43,7 +43,7 @@
 
         <!-- Article Content -->
         <div class="article-body-container container">
-            <div class="article-body" [innerHTML]="blog.content"></div>
+            <div class="article-body" [innerHTML]="sanitizedContent"></div>
 
             <!-- Tags -->
             <div class="article-tags" *ngIf="getTags().length > 0">

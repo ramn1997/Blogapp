@@ -116,10 +116,25 @@ const WriteBlogScreen = ({ navigation, route }: any) => {
       
       if (image) {
         const formData = new FormData();
+        
+        // Prepare file object for React Native FormData
+        const uriParts = image.uri.split('.');
+        const fileExtension = uriParts[uriParts.length - 1];
+        const fileName = `upload_${Date.now()}.${fileExtension}`;
+        
         // @ts-ignore
-        formData.append('file', { uri: image.uri, type: 'image/jpeg', name: 'cover.jpg' });
+        formData.append('file', {
+          uri: Platform.OS === 'ios' ? image.uri.replace('file://', '') : image.uri,
+          name: fileName,
+          type: `image/${fileExtension === 'jpg' ? 'jpeg' : fileExtension}`,
+        });
+
         const uploadRes = await api.post('/api/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+          headers: { 
+            'Content-Type': 'multipart/form-data',
+            // Specifically for some Axios versions on mobile, ensure we don't have other global headers interfering
+          },
+          transformRequest: (data) => data, // Ensure Axios doesn't stringify FormData
         });
         coverImageUrl = uploadRes.data.url;
       }

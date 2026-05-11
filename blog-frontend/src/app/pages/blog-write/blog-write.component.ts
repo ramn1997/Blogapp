@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -150,7 +151,11 @@ export class BlogWriteComponent implements OnInit {
       this.blogService.uploadImage(file).subscribe({
         next: (res) => {
           const img = document.createElement('img');
-          img.src = res.url;
+          // Normalize the URL for immediate display in the editor
+          const baseUrl = environment.apiUrl.replace(/\/$/, '');
+          const cleanUrl = res.url.startsWith('/') ? res.url.substring(1) : res.url;
+          img.src = res.url.startsWith('http') ? res.url : `${baseUrl}/${cleanUrl}`;
+          
           img.style.maxWidth = '100%';
           img.style.borderRadius = '8px';
           img.style.margin = '20px 0';

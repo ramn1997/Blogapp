@@ -11,6 +11,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BlogDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ─── Performance & Monitoring ───────────────────────────────────────────────
+builder.Services.AddApplicationInsightsTelemetry();
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
+builder.Services.AddHealthChecks();
+
+// Increase multipart body length for large image uploads
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10MB
+});
+
 // ─── Auth Services ────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
@@ -119,6 +134,29 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
+app.UseResponseCompression();
+
+// ─── Global Exception Handler ───────────────────────────────────────────────
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        context.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+        context.Response.ContentType = "application/json";
+        var contextFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (contextFeature != null)
+        {
+            // The error is automatically logged to Application Insights if configured
+            await context.Response.WriteAsJsonAsync(new
+            {
+                StatusCode = context.Response.StatusCode,
+                Message = "An internal server error occurred. Please try again later.",
+                Detailed = app.Environment.IsDevelopment() ? contextFeature.Error.Message : null
+            });
+        }
+    });
+});
+
 app.UseCors("AllowAngular");
 app.UseHttpsRedirection();
 
@@ -141,6 +179,7 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 // ─── Auto Migrate Database ────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
